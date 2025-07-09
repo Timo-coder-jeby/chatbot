@@ -245,6 +245,11 @@ const handleSendMessage = async (message: string) => {
                   color: message.role === 'user' ? '#fff' : '#f56a00'
                 }
               }"
+              :styles="{
+                content: {
+                  backgroundColor: message.role === 'user' ? '#b7eb8f' : '',
+                }
+              }"
             />
           </div>
 
@@ -265,6 +270,7 @@ const handleSendMessage = async (message: string) => {
         <!-- Sender 输入组件 -->
         <div class="sender-area">
           <AXSender
+              :autoSize="{ minRows: 3, maxRows: 6 }"
               :loading="isTyping"
               placeholder="输入消息..."
               @submit="handleSendMessage"
