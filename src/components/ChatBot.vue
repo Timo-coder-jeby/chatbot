@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, reactive, inject } from 'vue'
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import { ref, computed, reactive, inject,h } from 'vue'
+import { message } from "ant-design-vue";
+import { PlusOutlined, SettingOutlined } from '@ant-design/icons-vue'
 import { type IAIService } from '@/services/aiService'
 
 const aiService = inject<IAIService>('aiService')!
@@ -188,6 +189,12 @@ const handleSendMessage = async (message: string) => {
     isTyping.value = false
   }
 }
+const BASEURL = import.meta.env.VITE_APP_BASE_API
+const uploadChange = ({file}:any) => {
+  if (file.status === 'done'){
+    message.success('微调数据上传成功')
+  }
+}
 
 </script>
 <template>
@@ -220,14 +227,25 @@ const handleSendMessage = async (message: string) => {
         <a-typography-title :level="3" style="margin: 0;">
           {{ currentConversationTitle }}
         </a-typography-title>
-        <a-space>
+        <a-upload
+          :action="BASEURL + '/document/load/file'"
+          @change="uploadChange"
+          name="files"
+        >
+          <a-button
+            type="primary"
+            ghost
+            :icon="h(SettingOutlined)"
+          >模型微调</a-button>
+        </a-upload>
+<!--        <a-space>
           <a-button type="text" @click="clearCurrentChat">
             <template #icon>
               <DeleteOutlined />
             </template>
             清空
           </a-button>
-        </a-space>
+        </a-space>-->
       </div>
 
       <!-- 聊天内容区域 -->

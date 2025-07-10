@@ -17,6 +17,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/chat/, '/chat'),
         target: 'http://192.168.1.147:16070',
+      },
+      '/upload': {
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/upload/, ''),
+        target: 'http://192.168.1.147:16070'
       }
     }
   },

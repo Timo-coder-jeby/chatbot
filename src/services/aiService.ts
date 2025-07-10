@@ -87,7 +87,7 @@ class AIService implements IAIService {
           'Authorization': `Bearer ${this.config.apiKey}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({...data,role: '云流智能法律机器人'})
       })
 
       if (!response.ok) {

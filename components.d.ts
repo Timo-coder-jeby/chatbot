@@ -15,6 +15,7 @@ declare module 'vue' {
     ASpace: typeof import('ant-design-vue/es')['Space']
     ATypographyText: typeof import('ant-design-vue/es')['TypographyText']
     ATypographyTitle: typeof import('ant-design-vue/es')['TypographyTitle']
+    AUpload: typeof import('ant-design-vue/es')['Upload']
     AXBubble: typeof import('ant-design-x-vue')['Bubble']
     AXConversations: typeof import('ant-design-x-vue')['Conversations']
     AXSender: typeof import('ant-design-x-vue')['Sender']
