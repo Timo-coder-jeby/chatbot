@@ -108,7 +108,7 @@
       <!-- 聊天内容区域 -->
       <div class="chat-content">
         <!-- 聊天消息区域 -->
-        <div class="chat-messages" v-if="currentMessages.length > 0">
+        <div class="chat-messages" v-if="currentMessages.length > 0" ref="chatMessagesRef">
           <div v-for="message in currentMessages" :key="message.key" class="message-item">
             <AXBubble
               :placement="message.role === 'user' ? 'end' : 'start'"
@@ -128,7 +128,7 @@
             />
           </div>
 
-          <!-- AI正在输入提示 -->
+          <!-- AI正在���入提示 -->
           <div v-if="isTyping" class="message-item">
             <AXBubble
               placement="start"
@@ -158,7 +158,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, inject, h } from 'vue'
+import { ref, computed, reactive, inject, h, nextTick } from 'vue'
 import { message } from "ant-design-vue";
 import { PlusOutlined, SettingOutlined, UserOutlined, MessageOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
 import { type IAIService } from '@/services/aiService'
@@ -183,6 +183,7 @@ interface MessageItem {
 const activeConversationKey = ref('conv-1')
 const isTyping = ref(false)
 const senderValue = ref('')
+const chatMessagesRef = ref<HTMLElement>()
 
 // 对话列表
 const conversationList = reactive<ConversationItem[]>([
@@ -239,6 +240,8 @@ const createNewChat = () => {
 
 const handleConversationChange = (key: string) => {
   activeConversationKey.value = key
+  // 切换对话后自动滚动到底部
+  scrollToBottom()
 }
 
 const deleteConversation = (key: string) => {
@@ -289,6 +292,9 @@ const handleSendMessage = async (message: string) => {
 
   messageStorage[activeConversationKey.value].push(userMessage)
 
+  // 添加用户消息后自动滚动到底部
+  scrollToBottom()
+
   // 更新对话标题（首次消息）
   if (messageStorage[activeConversationKey.value].length === 1) {
     currentConversation.label = message.slice(0, 15) + (message.length > 15 ? '...' : '')
@@ -314,19 +320,23 @@ const handleSendMessage = async (message: string) => {
       },
       // 流式回调函数 - 实时更新AI消息内容
       (chunk: string) => {
-        // 只有在第一次收到chunk且还��添加时才添加到消息列表
+        // 只有在第一次收到chunk且还未添加时才添加到消息列表
         if (!aiMessageAdded && chunk.trim()) {
           aiMessage.content = chunk
           messageStorage[activeConversationKey.value].push(aiMessage)
           aiMessageAdded = true
           // 收到第一个有效chunk时立即关闭typing状态
           isTyping.value = false
+          // AI消息开始时自动滚动
+          scrollToBottom()
         } else if (aiMessageAdded) {
           // 如果已经添加到列表中，直接更新响应式数组中的对象
           const currentMessages = messageStorage[activeConversationKey.value]
           const lastMessage = currentMessages[currentMessages.length - 1]
           if (lastMessage && lastMessage.role === 'assistant') {
             lastMessage.content += chunk
+            // AI消息更新时也自动滚动
+            scrollToBottom()
           }
         }
       }
@@ -334,7 +344,7 @@ const handleSendMessage = async (message: string) => {
 
     // 如果没有收到����何内容，添加错误消息
     if (!aiMessageAdded) {
-      aiMessage.content = '抱歉，没有收到���复，请重试。'
+      aiMessage.content = '抱歉，没有收到回复，请重试。'
       messageStorage[activeConversationKey.value].push(aiMessage)
     }
   } catch (error) {
@@ -355,6 +365,19 @@ const uploadChange = ({file}:any) => {
   }
 }
 
+// 自动滚动到底部
+const scrollToBottom = () => {
+  nextTick(() => {
+    const chatMessages = document.querySelector('.chat-messages')
+    if (chatMessages) {
+      chatMessages.scrollTo({
+        top: chatMessages.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
+  })
+}
+
 // 格式化时间
 const formatTime = (timestamp: number) => {
   const now = Date.now()
@@ -365,7 +388,7 @@ const formatTime = (timestamp: number) => {
 
   if (minutes < 1) return '刚刚'
   if (minutes < 60) return `${minutes}分钟前`
-  if (hours < 24) return `${hours}小时前`
+  if (hours < 24) return `${hours}小时��`
   if (days < 7) return `${days}天前`
   return new Date(timestamp).toLocaleDateString()
 }
@@ -661,6 +684,7 @@ const handleMenuClick = (e: { key: string }, conversationKey: string) => {
 
         .user-avatar {
           font-size: 20px;
+          line-height: 20px;
           color: #6366f1;
           margin-right: 12px;
           background: rgba(99, 102, 241, 0.1);
