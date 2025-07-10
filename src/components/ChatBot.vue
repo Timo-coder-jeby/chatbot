@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive, inject,h } from 'vue'
 import { message } from "ant-design-vue";
-import { PlusOutlined, SettingOutlined } from '@ant-design/icons-vue'
+import { PlusOutlined, SettingOutlined,UserOutlined } from '@ant-design/icons-vue'
 import { type IAIService } from '@/services/aiService'
 
 const aiService = inject<IAIService>('aiService')!
@@ -224,9 +224,9 @@ const uploadChange = ({file}:any) => {
     <div class="main-content">
       <!-- 顶部标题 -->
       <div class="chat-header">
-        <a-typography-title :level="3" style="margin: 0;">
+<!--        <a-typography-title :level="3" style="margin: 0;">
           {{ currentConversationTitle }}
-        </a-typography-title>
+        </a-typography-title>-->
         <a-upload
           :action="BASEURL + '/document/load/file'"
           @change="uploadChange"
@@ -257,7 +257,7 @@ const uploadChange = ({file}:any) => {
               :placement="message.role === 'user' ? 'end' : 'start'"
               :content="message.content"
               :avatar="{
-                icon: message.role === 'user' ? 'Ztc' : '🤖',
+                icon: h(message.role === 'user' ? UserOutlined : '🤖'),
                 style:{
                   backgroundColor: message.role === 'user' ? '#00b96b' : '#fde3cf',
                   color: message.role === 'user' ? '#fff' : '#f56a00'
@@ -283,7 +283,7 @@ const uploadChange = ({file}:any) => {
         </div>
 
         <!-- 欢��信息（仅在无消息时显示） -->
-        <h3 v-else class="tips">🤖有什么我可以帮助您的吗？</h3>
+        <h3 v-else class="tips">有什么可以帮助您的吗？</h3>
 
         <!-- Sender 输入组件 -->
         <div class="sender-area">
@@ -364,6 +364,7 @@ const uploadChange = ({file}:any) => {
         text-align: center;
         padding: 20% 0 15px;
         color: #333;
+        font-weight: 600;
       }
     }
   }
