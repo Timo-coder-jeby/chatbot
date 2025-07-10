@@ -6,7 +6,7 @@
       <div class="sidebar-brand">
         <div class="brand-logo">
           <div class="logo-icon">🤖</div>
-          <span class="brand-text">AI Chat</span>
+          <span class="brand-text">Cloudata Ai</span>
         </div>
       </div>
 
