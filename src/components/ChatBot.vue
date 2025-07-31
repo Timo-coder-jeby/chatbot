@@ -5,7 +5,7 @@
       <!-- 顶部品牌区域 -->
       <div class="sidebar-brand">
         <div class="brand-logo">
-          <div class="logo-icon">🤖</div>
+          <img class="logo-icon" :src="robotImg"/>
           <span class="brand-text">Cloudata Ai</span>
         </div>
       </div>
@@ -114,7 +114,7 @@
               :placement="message.role === 'user' ? 'end' : 'start'"
               :content="message.content"
               :avatar="{
-                icon: message.role === 'user' ? h(UserOutlined) : '🤖',
+                ...(message?.role === 'user' ? {icon: h(UserOutlined)} : {src: robotImg}),
                 style:{
                   backgroundColor: message.role === 'user' ? '#00b96b' : '#fde3cf',
                   color: message.role === 'user' ? '#fff' : '#f56a00'
@@ -128,12 +128,12 @@
             />
           </div>
 
-          <!-- AI正在���入提示 -->
+          <!-- AI正在提示 -->
           <div v-if="isTyping" class="message-item">
             <AXBubble
               placement="start"
               content=""
-              :avatar="{ icon: '🤖' }"
+              :avatar="{ src: robotImg }"
               :typing="true"
             />
           </div>
@@ -161,9 +161,10 @@
 import { ref, computed, reactive, inject, h, nextTick } from 'vue'
 import { message } from "ant-design-vue";
 import { PlusOutlined, SettingOutlined, UserOutlined, MessageOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
-import { type IAIService } from '@/services/aiService'
-
+import { type IAIService} from '@/services/aiService'
 const aiService = inject<IAIService>('aiService')!
+import robotImg from '@/assets/icons/robots.png'
+
 // 类型定义
 interface ConversationItem {
   key: string
@@ -178,6 +179,8 @@ interface MessageItem {
   content: string
   timestamp: number
 }
+
+// const robotImg = import.meta.glob('../assets/icons/robots.png')
 
 // 响应式数据
 const activeConversationKey = ref('conv-1')
@@ -470,13 +473,15 @@ const handleMenuClick = (e: { key: string }, conversationKey: string) => {
         align-items: center;
 
         .logo-icon {
-          font-size: 28px;
-          line-height: 28px;
-          margin-right: 12px;
+          width: 40px;
+          height: 40px;
+          border-radius: 8px;
           padding: 8px;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+          background: rgba(99, 102, 241, 0.1);
+          margin-right: 4px;
+          box-shadow:
+              0 8px 32px rgba(99, 102, 241, 0.12),
+              0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
         .brand-text {
@@ -797,7 +802,7 @@ const handleMenuClick = (e: { key: string }, conversationKey: string) => {
         backdrop-filter: blur(20px);
         border-top: 1px solid rgba(99, 102, 241, 0.08);
 
-        // 优化发送器样式
+        // 优化发送器��式
         :deep(.ant-sender) {
           border-radius: 20px;
           border: 2px solid rgba(99, 102, 241, 0.4);
