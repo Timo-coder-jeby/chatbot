@@ -1,0 +1,209 @@
+.chat-container {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  grid-template-rows: 1fr;
+  gap: 16px;
+  height: 100vh;
+  width: 100vw;
+  padding: 16px;
+  background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 50%, #cbd5e1 100%);
+  position: relative;
+  box-sizing: border-box;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+            radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.15) 1px, transparent 0),
+            linear-gradient(rgba(99, 102, 241, 0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99, 102, 241, 0.02) 1px, transparent 1px);
+    background-size: 25px 25px, 25px 25px, 25px 25px;
+    z-index: 0;
+  }
+
+  // 添加科技感光晕效果
+  &::after {
+    content: '';
+    position: absolute;
+    top: 20%;
+    right: 15%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: float 8s ease-in-out infinite;
+    z-index: 0;
+  }
+
+
+  .main-content {
+    grid-column: 2;
+    grid-row: 1;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    position: relative;
+    z-index: 1;
+    border-radius: 24px;
+    box-shadow:
+            0 8px 32px rgba(99, 102, 241, 0.08),
+            0 2px 8px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    .chat-header {
+      grid-row: 1;
+      padding: 24px 28px;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.02), rgba(139, 92, 246, 0.02));
+    }
+
+  }
+}
+
+// 动画定义
+@keyframes moveGrid {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(25px, 25px);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.7;
+  }
+  25% {
+    transform: translateY(-10px) rotate(1deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-20px) rotate(-1deg);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(-10px) rotate(0.5deg);
+    opacity: 0.9;
+  }
+}
+
+
+
+
+// 响应式设计 - 基于 Grid 优化
+@media (max-width: 1024px) {
+  .chat-container {
+    grid-template-columns: 260px 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-container {
+    grid-template-columns: 240px 1fr;
+    gap: 8px;
+    padding: 8px;
+
+    .sidebar {
+      border-radius: 16px;
+    }
+
+    .main-content {
+      border-radius: 16px;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .chat-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 200px 1fr;
+    gap: 8px;
+    padding: 8px;
+
+    .sidebar {
+      grid-column: 1;
+      grid-row: 1;
+      border-radius: 16px;
+
+      .conversations-wrapper {
+        padding: 8px;
+      }
+    }
+
+    .main-content {
+      grid-column: 1;
+      grid-row: 2;
+      border-radius: 16px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-container {
+    padding: 4px;
+    gap: 4px;
+
+    .sidebar {
+      .sidebar-brand .brand-logo .logo-icon {
+        font-size: 24px;
+        padding: 6px;
+      }
+
+      .sidebar-brand .brand-logo .brand-text {
+        font-size: 18px;
+      }
+
+      .sidebar-header {
+        padding: 16px;
+
+        :deep(.ant-btn-primary) {
+          height: 44px;
+          font-size: 14px;
+        }
+      }
+    }
+
+    .main-content {
+      .chat-header {
+        padding: 16px 20px;
+
+        :deep(.ant-btn) {
+          height: 36px;
+          font-size: 14px;
+        }
+      }
+
+      .chat-content {
+        .chat-messages {
+          padding: 16px;
+        }
+
+        .sender-area {
+          padding: 16px;
+
+          :deep(.ant-sender) {
+            border-radius: 16px;
+
+            .ant-btn-primary {
+              width: 44px;
+              height: 44px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

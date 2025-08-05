@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios,{ type Axios } from 'axios'
 
 // AI 服务配置
 interface AIConfig {
@@ -19,6 +19,21 @@ type StreamParams = {
   question: string,
   role?: string
 }
+
+interface ConversationItem {
+  key: string
+  label: string
+  timestamp: number,
+  sessionKey?: string
+}
+
+interface MessageItem {
+  key: string
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: number
+}
+
 // AI 服务接口约束
 interface IAIService {
   createMessage(): Promise<AIResponse>
@@ -26,13 +41,18 @@ interface IAIService {
     data: StreamParams,
     onChunk?: (chunk: string) => void
   ): Promise<AIResponse>
+  get: (url: string, params?: any, cof?: any) => Promise<any>
+  post: (url: string, data?: any, cof?: any) => Promise<any>
+  del: (url: string, params?: any, cof?: any) => Promise<any>
+  put: (url: string, data?: any, cof?: any) => Promise<any>
 }
 
 class AIService implements IAIService {
   private config: AIConfig
-
+  public service: Axios
   constructor(config: AIConfig) {
     this.config = config
+    this.service = axios
   }
 
   // 创建新会话
@@ -81,7 +101,8 @@ class AIService implements IAIService {
     onChunk?: (chunk: string) => void
   ): Promise<AIResponse> {
     try {
-      const response = await fetch(`${this.config.baseURL}/post/stream/flux`, {
+      // const response = await fetch(`${this.config.baseURL}/post/stream/flux/streaming`, {
+      const response = await fetch(`${this.config.baseURL}/post/stream/flux1`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.config.apiKey}`,
@@ -165,6 +186,36 @@ class AIService implements IAIService {
       }
     }
   }
+
+  get(url: string,params?:any,cof?:any):Promise<any>{
+    return new Promise((resolve) => {
+      this.service.get(url,{params,...cof})
+        .then((resp:any) => resolve(resp?.data?.data || resp?.data))
+        .catch((error) => resolve(error))
+    })
+  }
+  post(url: string,data?:any,cof?:any):Promise<any>{
+    return new Promise((resolve) => {
+      this.service.post(url,data,cof)
+        .then((resp:any) => resolve(resp.data || resp?.data))
+        .catch((error:any) => resolve(error))
+    })
+  }
+  del(url: string,params?:any,cof?:any):Promise<any>{
+    return new Promise((resolve) => {
+      this.service.delete(url,{params,...cof})
+        .then((resp:any) => resolve(resp?.data?.data || resp?.data))
+        .catch((error:any) => resolve(error))
+    })
+  }
+  put(url: string,data?:any,cof?:any):Promise<any>{
+    return new Promise((resolve) => {
+      this.service.put(url,data,cof)
+        .then((resp:any) => resolve(resp?.data?.data || resp?.data))
+        .catch((error:any) => resolve(error))
+    })
+  }
+
 }
 
 // 创建默认 AI 服务实例
@@ -179,4 +230,10 @@ export const createAIService = (config?: Partial<AIConfig>) => {
   return new AIService(defaultConfig)
 }
 
-export { AIService, type AIResponse,type IAIService }
+export {
+  AIService,
+  type AIResponse,
+  type IAIService,
+  type ConversationItem,
+  type MessageItem
+}

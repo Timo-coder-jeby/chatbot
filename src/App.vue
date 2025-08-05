@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ChatBot from '@/components/ChatBot.vue'
+import ChatBot from '@/components/Chatbot/index.vue'
 </script>
 
 <template>
