@@ -39,7 +39,8 @@ interface IAIService {
   createMessage(): Promise<AIResponse>
   sendMessageStream(
     data: StreamParams,
-    onChunk?: (chunk: string) => void
+    onChunk?: (chunk: string) => void,
+    signal?: AbortSignal
   ): Promise<AIResponse>
   get: (url: string, params?: any, cof?: any) => Promise<any>
   post: (url: string, data?: any, cof?: any) => Promise<any>
@@ -85,7 +86,7 @@ class AIService implements IAIService {
       } else if (error.response?.status === 429) {
         errorMessage = '请求过于频繁，请稍后重试。'
       } else if (error.code === 'ECONNABORTED') {
-        errorMessage = '请求超时，请检查网络连接。'
+        errorMessage = '请求��时，请检查网络连接。'
       }
 
       return {
@@ -98,17 +99,18 @@ class AIService implements IAIService {
   // 流式响应
   async sendMessageStream(
     data: StreamParams,
-    onChunk?: (chunk: string) => void
+    onChunk?: (chunk: string) => void,
+    signal?: AbortSignal
   ): Promise<AIResponse> {
     try {
-      // const response = await fetch(`${this.config.baseURL}/post/stream/flux/streaming`, {
       const response = await fetch(`${this.config.baseURL}/post/stream/flux1`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.config.apiKey}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({...data,role: '云流智能法律机器人'})
+        body: JSON.stringify({...data,role: '云流智能法律机器人'}),
+        signal // 添加 AbortController 的 signal
       })
 
       if (!response.ok) {
@@ -125,6 +127,11 @@ class AIService implements IAIService {
 
       try {
         while (true) {
+          // 检查是否被取消
+          if (signal?.aborted) {
+            throw new DOMException('The operation was aborted.', 'AbortError')
+          }
+
           const { done, value } = await reader.read()
 
           if (done) break
@@ -134,6 +141,11 @@ class AIService implements IAIService {
 
           for (const line of lines) {
             if (line.trim() === '') continue
+
+            // 再次检查是否被取消
+            if (signal?.aborted) {
+              throw new DOMException('The operation was aborted.', 'AbortError')
+            }
 
             // 处理SSE格式的流式响应
             let content = ''
@@ -156,7 +168,7 @@ class AIService implements IAIService {
                 }
               }
             } else if (!line.startsWith('event:') && !line.startsWith('id:') && !line.startsWith('retry:')) {
-              // 处理非SSE格式的普通文本流
+              // 处理非SSE格式��普通文本流
               // 也要检查是否包含data:前缀
               if (line.includes('data:')) {
                 content = line.replace(/data:/g, '')
@@ -181,6 +193,12 @@ class AIService implements IAIService {
       }
     } catch (error: any) {
       console.error('流式请求失败:', error)
+      
+      // 如果是取消错误，重新抛出以便上层处理
+      if (error.name === 'AbortError') {
+        throw error
+      }
+      
       return {
         error: error.message
       }

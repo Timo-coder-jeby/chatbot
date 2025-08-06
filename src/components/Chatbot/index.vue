@@ -31,6 +31,7 @@
         :isTyping="isTyping"
         v-model:senderValue="senderValue"
         @send-message="handleSendMessage"
+        @cancel-conversation="handleCancelConversation"
         ref="chatContentRef"
       />
     </div>
@@ -102,7 +103,7 @@ const loadConversationList = async () => {
       currentMessages.value = []
     }
   } catch (error) {
-    console.error('获取对话列表失败:', error)
+    console.error('获取对话列���失败:', error)
     // 如果获取失败，保持默认对话
     if (conversationList.length === 0) {
       const defaultConversation: ConversationItem = {
@@ -228,6 +229,9 @@ const deleteConversation = async (key: string) => {
   }
 }
 
+// 用于控制流式响应的 AbortController
+let abortController: AbortController | null = null
+
 const handleSendMessage = async (message: string) => {
   if (!message.trim() || isTyping.value) return
 
@@ -241,6 +245,9 @@ const handleSendMessage = async (message: string) => {
   if (!currentConversation) return
 
   isTyping.value = true
+
+  // 创建新的 AbortController
+  abortController = new AbortController()
 
   // 如果没有sessionKey，先创建会话
   if (!currentConversation.sessionKey) {
@@ -278,7 +285,7 @@ const handleSendMessage = async (message: string) => {
   let aiMessageAdded = false
 
   try {
-    // 使用流式响应
+    // 使用流式响应，传入 signal
     await aiService.sendMessageStream(
       {
         sessionId: currentConversation.sessionKey ?? '',
@@ -286,6 +293,11 @@ const handleSendMessage = async (message: string) => {
       },
       // 流式回调函数 - 实时更新AI消息内容
       (chunk: string) => {
+        // 检查是否已被取消
+        if (abortController?.signal.aborted) {
+          return
+        }
+
         // 只有在第一次收到chunk且还未添加时才添加到消息列表
         if (!aiMessageAdded && chunk.trim()) {
           aiMessage.content = chunk
@@ -302,7 +314,9 @@ const handleSendMessage = async (message: string) => {
             scrollToBottom()
           }
         }
-      }
+      },
+      // 传入 AbortController 的 signal
+      abortController.signal
     )
 
     // 如果没有收到任何内容，添加错误消息
@@ -310,15 +324,40 @@ const handleSendMessage = async (message: string) => {
       aiMessage.content = '抱歉，没有收到回复，请重试。'
       currentMessages.value.push(aiMessage)
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('发送消息失败:', error)
-    // 如果流式请求失败，显示错误信息
-    if (!aiMessageAdded) {
-      aiMessage.content = '抱歉，服务暂时不可用，请稍后重试。'
-      currentMessages.value.push(aiMessage)
+
+    // 如果是用户取消，显示取消消息
+    if (error.name === 'AbortError' || abortController?.signal.aborted) {
+      if (aiMessageAdded) {
+        // 如果已经有AI消息，在末尾添加取消标识
+        const lastMessage = currentMessages.value[currentMessages.value.length - 1]
+        if (lastMessage && lastMessage.role === 'assistant') {
+          lastMessage.content += '\n\n*[会话已取消]*'
+        }
+      } else {
+        // 如果还没有AI消息，添加取消消息
+        aiMessage.content = '*[会话已取消]*'
+        currentMessages.value.push(aiMessage)
+      }
+    } else {
+      // 其他错误
+      if (!aiMessageAdded) {
+        aiMessage.content = '抱歉，服务暂时不可用，请稍后重试。'
+        currentMessages.value.push(aiMessage)
+      }
     }
   } finally {
     // 只在流式响应完全结束后才取消 loading 状态
+    isTyping.value = false
+    abortController = null
+  }
+}
+
+const handleCancelConversation = () => {
+  // 直接取消当前的流式请求
+  if (abortController) {
+    abortController.abort()
     isTyping.value = false
   }
 }

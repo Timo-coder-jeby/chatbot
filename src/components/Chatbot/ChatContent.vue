@@ -38,6 +38,7 @@
           :loading="isTyping"
           placeholder="输入消息..."
           @submit="handleSendMessage"
+          @cancel="onCancel"
           v-model:value="inputValue"
       />
     </div>
@@ -65,6 +66,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'send-message': [message: string]
   'update:senderValue': [value: string]
+  'cancel-conversation': []
 }>()
 
 const chatMessagesRef = ref<HTMLElement>()
@@ -205,12 +207,16 @@ const scrollToBottom = () => {
   })
 }
 
-// 监听消息变化，自动滚动
+// 处理取消对话
+const onCancel = () => {
+  // 发送取消事件给父组件
+  emit('cancel-conversation')
+}
+
 watch(() => props.messages, () => {
   scrollToBottom()
 }, { deep: true })
 
-// 监听打字状态变化，自动滚动
 watch(() => props.isTyping, () => {
   if (props.isTyping) {
     scrollToBottom()
