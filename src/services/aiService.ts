@@ -32,6 +32,7 @@ interface MessageItem {
   role: 'user' | 'assistant'
   content: string
   timestamp: number
+  isTyping?: boolean
 }
 
 // AI 服务接口约束

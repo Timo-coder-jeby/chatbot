@@ -21,7 +21,7 @@
             type="primary"
             ghost
             :icon="h(SettingOutlined)"
-          >RAG向量数据</a-button>
+          >RAG DATA</a-button>
         </a-upload>
       </div>
 
@@ -70,48 +70,47 @@ onMounted(() => {
  */
 const loadConversationList = async () => {
   try {
-    const sessionObj = await aiService.get('/chat/sessions')
+    const { sessions } = await aiService.get('/chat/sessions')
 
-    // 清空现有对话列表
-    conversationList.length = 0
+    // 直接替换整个数组而不是逐个push，减少数组操作次数
+    if (Array.isArray(sessions) && sessions.length > 0) {
+      // 一次性映射和排序，减少遍历次数
+      const mappedSessions = sessions
+        .map((session: any) => ({
+          key: session.session_id,
+          label: session.title
+            ? (session.title.replace(/\r\n/g, '').slice(0, 30) + (session.title.length > 30 ? '...' : ''))
+            : '新建对话',
+          timestamp: new Date(session.create_time || session.createTime).getTime(),
+          sessionKey: session.session_id
+        }))
 
-    if (sessionObj?.sessions?.length > 0) {
-      // 转换服务器返回的数据为本地数据结构
-      sessionObj.sessions.forEach((session: any) => {
-        const conversation: ConversationItem = {
-          key: session.sessionId,
-          label: session.title || '新建对话',
-          timestamp: new Date(session.createTime).getTime(),
-          sessionKey: session.sessionId
-        }
-        conversationList.push(conversation)
-      })
+      // 直接替换整个数组
+      conversationList.splice(0, conversationList.length, ...mappedSessions)
 
       // 设置第一个对话为活跃对话并加载其消息
-      const firstConversation = conversationList[0]
-      activeConversationKey.value = firstConversation.key
-      await loadCurrentMessages(firstConversation.key)
+      activeConversationKey.value = mappedSessions[0].key
+      await loadCurrentMessages(mappedSessions[0].key)
     } else {
-      // 如果接口返回空数组，插入一条新消息
+      // 如果接口返回空数组，直接替换为默认对话
       const defaultConversation: ConversationItem = {
         key: 'conv-1',
         label: '新建对话',
         timestamp: Date.now()
       }
-      conversationList.push(defaultConversation)
+      conversationList.splice(0, conversationList.length, defaultConversation)
       activeConversationKey.value = 'conv-1'
       currentMessages.value = []
     }
   } catch (error) {
-    console.error('获取对话列���失败:', error)
-    // 如果获取失败，保持默认对话
+    console.error('获取对话失败:', error)
     if (conversationList.length === 0) {
       const defaultConversation: ConversationItem = {
         key: 'conv-1',
         label: '新建对话',
         timestamp: Date.now()
       }
-      conversationList.push(defaultConversation)
+      conversationList.splice(0, conversationList.length, defaultConversation)
       activeConversationKey.value = 'conv-1'
       currentMessages.value = []
     }
@@ -123,7 +122,7 @@ const loadConversationList = async () => {
  */
 const loadCurrentMessages = async (key: string) => {
   // 检查是否为新的会话（conv-开头）
-  const isNewConversation = key.startsWith('conv-')
+  const isNewConversation = key?.startsWith('conv-')
 
   if (isNewConversation) {
     // 查找对应的会话对象

@@ -67,8 +67,7 @@ const handleMenuClick = (e: any, conversationKey: string) => {
     <!-- 顶部品牌区域 -->
     <div class="sidebar-brand">
       <div class="brand-logo">
-        <img class="logo-icon" :src="robotImg" alt="AI Robot Logo"/>
-        <span class="brand-text">Cloudata Ai</span>
+        <span class="brand-text">CLOUDATA LEGAL SYS AI</span>
       </div>
     </div>
 
