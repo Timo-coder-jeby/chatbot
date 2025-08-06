@@ -21,7 +21,7 @@
             type="primary"
             ghost
             :icon="h(SettingOutlined)"
-          >模型微调</a-button>
+          >RAG向量数据</a-button>
         </a-upload>
       </div>
 
@@ -291,8 +291,6 @@ const handleSendMessage = async (message: string) => {
           aiMessage.content = chunk
           currentMessages.value.push(aiMessage)
           aiMessageAdded = true
-          // 收到第一个有效chunk时立即关闭typing状态
-          isTyping.value = false
           // AI消息开始时自动滚动
           scrollToBottom()
         } else if (aiMessageAdded) {
@@ -320,6 +318,7 @@ const handleSendMessage = async (message: string) => {
       currentMessages.value.push(aiMessage)
     }
   } finally {
+    // 只在流式响应完全结束后才取消 loading 状态
     isTyping.value = false
   }
 }
@@ -338,5 +337,5 @@ const scrollToBottom = () => {
 </script>
 
 <style lang="scss" scoped>
-@use './index'
+@use './index';
 </style>

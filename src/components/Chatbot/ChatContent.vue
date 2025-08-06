@@ -1,52 +1,29 @@
 <template>
   <div class="chat-content">
     <!-- 聊天消息区域 -->
-    <div class="chat-messages" v-if="messages.length > 0" ref="chatMessagesRef">
-      <div v-for="message in messages" :key="message.key" class="message-item">
-        <!-- 用户消息使用普通文本 -->
+    <div class="chat-messages" v-if="allMessages.length > 0" ref="chatMessagesRef">
+      <div v-for="message in allMessages" :key="message.key" class="message-item">
         <AXBubble
-          v-if="message.role === 'user'"
-          :placement="'end'"
+          :placement="message.role === 'user' ? 'end' : 'start'"
           :content="message.content"
-          :avatar="{
+          :messageRender="message.role === 'assistant' ? renderMarkdown : undefined"
+          :typing="message.isTyping"
+          :avatar="message.role === 'user' ? {
             icon: h(UserOutlined),
-            style:{
+            style: {
               backgroundColor: '#00b96b',
               color: '#fff'
             }
-          }"
+          } : { src: robotImg }"
           :styles="{
             content: {
-              backgroundColor: '#b7eb8f',
-            }
-          }"
-        />
-        <!-- AI消息使用Markdown渲染 -->
-        <AXBubble
-          v-else
-          :placement="'start'"
-          :content="message.content"
-          :messageRender="renderMarkdown"
-          :avatar="{ src: robotImg }"
-          :styles="{
-            content: {
-              backgroundColor: '#fff',
+              backgroundColor: message.role === 'user' ? '#b7eb8f' : '#fff',
               padding: '16px',
-              border: '1px solid #e5e7eb',
+              border: message.role === 'assistant' ? '1px solid #e5e7eb' : 'none',
               borderRadius: '12px',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+              boxShadow: message.role === 'assistant' ? '0 1px 3px rgba(0, 0, 0, 0.1)' : 'none'
             }
           }"
-        />
-      </div>
-
-      <!-- AI正在提示 -->
-      <div v-if="isTyping" class="message-item">
-        <AXBubble
-          placement="start"
-          content=""
-          :avatar="{ src: robotImg }"
-          :typing="true"
         />
       </div>
     </div>
@@ -68,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, h, nextTick, watch } from 'vue'
+import { ref, h, nextTick, watch, computed } from 'vue'
 import { UserOutlined } from '@ant-design/icons-vue'
 import { type MessageItem } from '@/services/aiService.ts'
 import MarkdownIt from 'markdown-it'
@@ -92,6 +69,33 @@ const emit = defineEmits<{
 
 const chatMessagesRef = ref<HTMLElement>()
 const inputValue = ref(props.senderValue)
+const currentAIContent = ref('')
+
+// 统一的消息列表 - 包含正常消息和typing状态
+const allMessages = computed(() => {
+  const result = [...props.messages]
+
+  // 如果正在打字，添加一个typing消息
+  if (props.isTyping) {
+    // 检查最后一个消息是否是 AI 消消息，如果是则不添加新的 typing 消息
+    const lastMessage = result[result.length - 1]
+    if (lastMessage && lastMessage.role === 'assistant') {
+      // 如果最后一个消息是 AI 消息，说明正在流式输出，不需要额外的 typing 气泡
+      return result
+    }
+
+    // 只有在没有 AI 消息正在输出时才显示 typing 气泡
+    result.push({
+      key: 'ai-typing',
+      role: 'assistant',
+      content: '',
+      timestamp: Date.now(),
+      isTyping: true
+    } as MessageItem & { isTyping: boolean })
+  }
+
+  return result
+})
 
 // 监听外部传入的 senderValue 变化
 watch(() => props.senderValue, (newValue) => {
@@ -101,6 +105,23 @@ watch(() => props.senderValue, (newValue) => {
 // 监听内部 inputValue 变化，同步到外部
 watch(inputValue, (newValue) => {
   emit('update:senderValue', newValue)
+})
+
+// 监听 typing 状态变化，重置 AI 内容
+watch(() => props.isTyping, (newVal) => {
+  if (!newVal) {
+    currentAIContent.value = ''
+  }
+})
+
+// 暴露方法给父组件更新 AI 内容
+const updateAIContent = (content: string) => {
+  currentAIContent.value = content
+}
+
+// 计算属性：判断当前消息列表中是否有AI消息
+const hasAIMessage = computed(() => {
+  return props.messages.some(message => message.role === 'assistant')
 })
 
 // 配置 markdown-it
@@ -121,49 +142,36 @@ const md: MarkdownIt = new MarkdownIt({
   }
 })
 
-// 改进的 Markdown 渲染函数 - 确保正确处理换行
+// 改进的 Markdown 渲染函数 - 优化版本
 const renderMarkdown = (content: string) => {
-  // 预处理内容，更智能地处理换行和格式
+  // 预处理内容，智能处理换行和格式
   let processedContent = content
     // 先保护代码块，避免被换行处理影响
     .replace(/```[\s\S]*?```/g, (match) => {
       return match.replace(/\n/g, '___CODEBLOCK_NEWLINE___')
     })
-    // 处理数字列表（1. 2. 3.）
-    .replace(/(\d+)\.\s+/g, '\n\n$1. ')
-    // 处理无序列表（- * +）
-    .replace(/^([*+-])\s+/gm, '\n$1 ')
-    // 处理标题
-    .replace(/^(#{1,6})\s+/gm, '\n\n$1 ')
-    // 处理段落分隔：将单个换行符转换为双换行符（但避免过多换行）
-    .replace(/([^.\n])\n([^*+\d\n-])/g, '$1\n\n$2')
-    // 清理多余的换行符
+    // 处理段落分隔：将单个换行符转换为双换行符（创建段落分隔）
+    .replace(/([^\n])\n([^\n*+\d-])/g, '$1\n\n$2')
+    // 清理多余的换行符（最多保留两个连续换行）
     .replace(/\n{3,}/g, '\n\n')
     // 恢复代码块中的换行符
     .replace(/___CODEBLOCK_NEWLINE___/g, '\n')
     // 确保开头和结尾没有多余的换行
     .trim()
 
-  // 如果内容包含代码块标记，确保代码块前后有适当的换行
-  if (processedContent.includes('```')) {
-    processedContent = processedContent
-      .replace(/([^\n])```/g, '$1\n\n```')
-      .replace(/```([^\n])/g, '```\n\n$1')
-  }
-
+  // 渲�� Markdown 为 HTML
   const htmlContent = md.render(processedContent)
 
   // 对渲染后的HTML进行后处理，改善显示效果
   const postProcessedHtml = htmlContent
+    // 移除 HR 标签
+    .replace(/<hr\s*\/?>/g, '')
     // 为段落添加适当的间距
     .replace(/<p>/g, '<p style="margin: 0 0 12px 0; line-height: 1.6;">')
     // 为列表项添加适当的间距
     .replace(/<li>/g, '<li style="margin: 4px 0; line-height: 1.5;">')
     // 为代码块添加样式
     .replace(/<pre class="hljs">/g, '<pre class="hljs" style="margin: 16px 0; border-radius: 6px; overflow-x: auto;">')
-
-  console.log('处理后的内容:', processedContent)
-  console.log('渲染后的HTML:', postProcessedHtml)
 
   return h('div', {
     innerHTML: postProcessedHtml,
@@ -211,7 +219,8 @@ watch(() => props.isTyping, () => {
 
 // 暴露方法给父组件
 defineExpose({
-  scrollToBottom
+  scrollToBottom,
+  updateAIContent
 })
 </script>
 
@@ -468,13 +477,6 @@ defineExpose({
             color: #64748b;
           }
 
-          hr {
-            margin: 24px 0;
-            border: none;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
-          }
-
           // 特殊格式化样式 - 法律文档
           .legal-title {
             text-align: center;
@@ -504,94 +506,6 @@ defineExpose({
     background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(248, 250, 252, 0.9));
     backdrop-filter: blur(20px);
     border-top: 1px solid rgba(99, 102, 241, 0.08);
-
-    // 优化发送器��式
-    :deep(.ant-sender) {
-      border-radius: 20px;
-      border: 2px solid rgba(99, 102, 241, 0.4);
-      box-shadow:
-          0 4px 24px rgba(99, 102, 241, 0.08),
-          0 2px 8px rgba(0, 0, 0, 0.04);
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-
-      // 动态边框环绕效果
-      &::before {
-        content: '';
-        position: absolute;
-        top: -1px;
-        left: -1px;
-        right: -1px;
-        bottom: -1px;
-        background: linear-gradient(90deg,
-            #6366f1, #8b5cf6, #ec4899, #f59e0b,
-            #10b981, #06b6d4, #6366f1, #8b5cf6);
-        background-size: 300% 100%;
-        border-radius: 21px;
-        z-index: -1;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        animation: borderFlow 4s linear infinite;
-        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        mask-composite: xor;
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        padding: 2px;
-      }
-
-      &:hover, &:focus-within {
-        border-color: rgba(99, 102, 241, 0.6);
-        box-shadow:
-            0 8px 32px rgba(99, 102, 241, 0.25),
-            0 4px 16px rgba(0, 0, 0, 0.08);
-        transform: translateY(-2px);
-
-        &::before {
-          opacity: 1;
-        }
-      }
-
-      .ant-input {
-        background: transparent;
-        border: none;
-        font-size: 15px;
-        line-height: 1.6;
-
-        &::placeholder {
-          color: rgba(100, 116, 139, 0.6);
-          font-style: italic;
-        }
-      }
-
-      .ant-btn-primary {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        border: none;
-        border-radius: 16px;
-        width: 48px;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
-
-        &:hover {
-          transform: scale(1.05);
-          box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-        }
-
-        &:active {
-          transform: scale(0.98);
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          transform: none;
-        }
-      }
-    }
   }
 
   .tips {
