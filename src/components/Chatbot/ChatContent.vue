@@ -126,68 +126,82 @@ const hasAIMessage = computed(() => {
   return props.messages.some(message => message.role === 'assistant')
 })
 
-// 配置 markdown-it
-const md: MarkdownIt = new MarkdownIt({
+// 预编译正则表达式和MarkdownIt实例 - O(1)空间复杂度
+const MESSAGE_PATTERNS = {
+  userMessage: /UserMessage \{[\s\S]*?TextContent \{ text = "([\s\S]*?)" \}[\s\S]*?\}/,
+  aiMessage: /AiMessage \{ text = "([\s\S]*?)" toolExecutionRequests/,
+  codeBlock: /```markdown\n([\s\S]*?)\n```/
+} as const
+
+const optimizedMd = new MarkdownIt({
   html: true,
   linkify: true,
-  typographer: true,
-  breaks: true, // 启用换行转换
+  breaks: true,
   highlight: function (str: string, lang: string): string {
     if (lang && hljs.getLanguage(lang)) {
       try {
-        return '<pre class="hljs"><code>' +
-               hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
-               '</code></pre>';
+        return hljs.highlight(str, { language: lang, ignoreIllegals: true }).value
       } catch (__) {}
     }
-    return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+    return optimizedMd.utils.escapeHtml(str)
   }
 })
 
-// 改进的 Markdown 渲染函数 - 优化版本
+// 简化高效的 Markdown 渲染函数
 const renderMarkdown = (content: string) => {
-  // 预处理内容，智能处理换行和格式
+  if (!content?.trim()) return h('div', '')
+
+  // 基础清理 - O(n)时间复杂度
   let processedContent = content
-    // 先保护代码块，避免被换行处理影响
-    .replace(/```[\s\S]*?```/g, (match) => {
-      return match.replace(/\n/g, '___CODEBLOCK_NEWLINE___')
+    .replace(/\\n/g, '\n')
+    .replace(/\\"/g, '"')
+    .replace(/\\r/g, '')
+
+  // 清理消息格式包装
+  processedContent = processedContent.replace(MESSAGE_PATTERNS.aiMessage, '$1')
+  processedContent = processedContent.replace(MESSAGE_PATTERNS.userMessage, '$1')
+
+  // 处理代码块
+  const codeBlockMatch = MESSAGE_PATTERNS.codeBlock.exec(processedContent)
+  if (codeBlockMatch) {
+    const beforeBlock = processedContent.substring(0, codeBlockMatch.index).trim()
+    const markdownContent = codeBlockMatch[1]
+    const afterBlock = processedContent.substring(codeBlockMatch.index + codeBlockMatch[0].length).trim()
+
+    processedContent = [beforeBlock, markdownContent, afterBlock]
+      .filter(Boolean)
+      .join('\n\n')
+  }
+
+  try {
+    let htmlContent = optimizedMd.render(processedContent)
+
+    // 简化的HTML后处理
+    htmlContent = htmlContent
+      .replace(/<p>/g, '<p style="margin: 8px 0; line-height: 1.6;">')
+      .replace(/<h([1-6])>/g, '<h$1 style="margin: 16px 0 8px 0; font-weight: 600; color: #1f2937;">')
+      .replace(/<ul>/g, '<ul style="margin: 12px 0; padding-left: 20px;">')
+      .replace(/<ol>/g, '<ol style="margin: 12px 0; padding-left: 20px;">')
+      .replace(/<li>/g, '<li style="margin: 4px 0; line-height: 1.5;">')
+      .replace(/<pre>/g, '<pre style="margin: 16px 0; padding: 16px; background: #f8f9fa; border-radius: 6px; overflow-x: auto; font-size: 14px; line-height: 1.4;">')
+      .replace(/<code>/g, '<code>')
+
+    return h('div', {
+      innerHTML: htmlContent,
+      class: 'markdown-content',
+      style: {
+        lineHeight: '1.6',
+        fontSize: '14px',
+        color: '#374151',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      }
     })
-    // 处理段落分隔：将单个换行符转换为双换行符（创建段落分隔）
-    .replace(/([^\n])\n([^\n*+\d-])/g, '$1\n\n$2')
-    // 清理多余的换行符（最多保留两个连续换行）
-    .replace(/\n{3,}/g, '\n\n')
-    // 恢复代码块中的换行符
-    .replace(/___CODEBLOCK_NEWLINE___/g, '\n')
-    // 确保开头和结尾没有多余的换行
-    .trim()
-
-  // 渲�� Markdown 为 HTML
-  const htmlContent = md.render(processedContent)
-
-  // 对渲染后的HTML进行后处理，改善显示效果
-  const postProcessedHtml = htmlContent
-    // 移除 HR 标签
-    .replace(/<hr\s*\/?>/g, '')
-    // 为段落添加适当的间距
-    .replace(/<p>/g, '<p style="margin: 0 0 12px 0; line-height: 1.6;">')
-    // 为列表项添加适当的间距
-    .replace(/<li>/g, '<li style="margin: 4px 0; line-height: 1.5;">')
-    // 为代码块添加样式
-    .replace(/<pre class="hljs">/g, '<pre class="hljs" style="margin: 16px 0; border-radius: 6px; overflow-x: auto;">')
-
-  return h('div', {
-    innerHTML: postProcessedHtml,
-    class: 'markdown-content',
-    style: {
-      lineHeight: '1.7',
-      fontSize: '14px',
-      wordBreak: 'break-word',
-      whiteSpace: 'normal',
-      wordWrap: 'break-word',
-      color: '#333',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-    }
-  })
+  } catch (error) {
+    console.error('Markdown渲染错误:', error)
+    return h('div', {
+      style: { whiteSpace: 'pre-wrap', fontSize: '14px', color: '#374151' }
+    }, processedContent)
+  }
 }
 
 // 处理发送消息
@@ -396,15 +410,6 @@ defineExpose({
             }
           }
 
-          code {
-            background: #f1f5f9;
-            color: #fff;
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 13px;
-            font-weight: 500;
-          }
 
           pre {
             margin: 18px 0;

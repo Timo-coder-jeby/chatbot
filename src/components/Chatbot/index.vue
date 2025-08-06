@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, reactive, inject, h, onMounted} from 'vue'
+import {ref, computed, reactive, inject, h, onMounted, nextTick} from 'vue'
 import { message } from "ant-design-vue";
 import { SettingOutlined } from '@ant-design/icons-vue'
 import { type IAIService, type ConversationItem, type MessageItem } from '@/services/aiService.ts'
@@ -118,7 +118,7 @@ const loadConversationList = async () => {
 }
 
 /**
- * 加载当前会话的消息
+ * 加载当前会话的消息 - 优化版本
  */
 const loadCurrentMessages = async (key: string) => {
   // 检查是否为新的会话（conv-开头）
@@ -141,42 +141,50 @@ const loadCurrentMessages = async (key: string) => {
   try {
     const response = await aiService.get(`/chat/session/messages/${key}`)
 
-    if (response && Array.isArray(response)) {
-      // 转换消息数据格式
-      const messages: MessageItem[] = response
-        .filter(item => item.type !== 'SYSTEM') // 过滤掉系统消息
-        .map(item => {
-          // 解析消息内容
-          let content = ''
-
-          if (item.type === 'USER') {
-            // 从 UserMessage 格式中提取文本内容
-            const match = item.text.match(/TextContent \{ text = "(.+?)" \}/)
-            content = match ? match[1].replace(/\\r\\n/g, '\n').replace(/\\"/g, '"') : item.text
-          } else if (item.type === 'AI') {
-            // 从 AiMessage 格式中提取文本内容
-            const match = item.text.match(/AiMessage \{ text = "(.+?)" toolExecutionRequests/)
-            content = match ? match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : item.text
-          }
-
-          return {
-            key: `${item.type.toLowerCase()}-${item.timestamp}`,
-            role: item.type === 'USER' ? 'user' : 'assistant',
-            content: content,
-            timestamp: item.timestamp
-          } as MessageItem
-        })
-        .sort((a, b) => a.timestamp - b.timestamp) // 按时间排序
-
-      currentMessages.value = messages
-
-      // 滚动到底部显示最新消息
-      setTimeout(() => {
-        scrollToBottom()
-      }, 100)
-    } else {
+    if (!response || !Array.isArray(response)) {
       currentMessages.value = []
+      return
     }
+
+    // 预编译正则表达式，避免重复编译 - O(1) 时间复杂度优化
+    const userMessageRegex = /UserMessage \{[\s\S]*?TextContent \{ text = "([\s\S]*?)" \}[\s\S]*?\}/
+    const simpleTextRegex = /TextContent \{ text = "(.*?)" \}/
+    const aiMessageRegex = /AiMessage \{ text = "([\s\S]*?)" toolExecutionRequests/
+
+    // 单次遍历处理所有消息 - O(n) 时间复杂度
+    const messages = response.reduce<MessageItem[]>((acc, item) => {
+      if (item.type === 'SYSTEM') return acc // 过滤系统消息
+
+      let content = ''
+
+      // 优化字符串匹配，减少正则执行次数
+      if (item.type === 'USER') {
+        const match = userMessageRegex.exec(item.text) || simpleTextRegex.exec(item.text)
+        content = match?.[1]?.replace(/\\r\\n/g, '\n').replace(/\\"/g, '"') ?? item.text
+      } else if (item.type === 'AI') {
+        const match = aiMessageRegex.exec(item.text)
+        content = match?.[1]?.replace(/\\n/g, '\n').replace(/\\"/g, '"') ?? item.text
+      }
+
+      acc.push({
+        key: `${item.type.toLowerCase()}-${item.timestamp}`,
+        role: item.type === 'USER' ? 'user' : 'assistant',
+        content,
+        timestamp: item.timestamp
+      })
+
+      return acc
+    }, [])
+
+    // 使用更高效的排序 - 避免不必要的比较
+    messages.sort((a, b) => a.timestamp - b.timestamp)
+
+    // 直接赋值，避免响应式数组操作开销
+    currentMessages.value = messages
+
+    // 使用 nextTick 优化 DOM 更新时机
+    nextTick(() => scrollToBottom())
+
   } catch (error) {
     console.error('获取会话消息失败:', error)
     currentMessages.value = []
