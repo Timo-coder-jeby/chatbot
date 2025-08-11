@@ -110,8 +110,8 @@ class AIService implements IAIService {
           'Authorization': `Bearer ${this.config.apiKey}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({...data,role: '云流智能法律机器人'}),
-        signal // 添加 AbortController 的 signal
+        body: JSON.stringify({...data, role: '云流智能法律机器人'}),
+        signal
       })
 
       if (!response.ok) {
@@ -128,79 +128,70 @@ class AIService implements IAIService {
 
       try {
         while (true) {
-          // 检查是否被取消
           if (signal?.aborted) {
             throw new DOMException('The operation was aborted.', 'AbortError')
           }
 
           const { done, value } = await reader.read()
-
           if (done) break
 
           const chunk = decoder.decode(value, { stream: true })
+
+          // 按行分割处理
           const lines = chunk.split('\n')
 
           for (const line of lines) {
-            if (line.trim() === '') continue
+            if (!line.trim()) continue
 
-            // 再次检查是否被取消
-            if (signal?.aborted) {
-              throw new DOMException('The operation was aborted.', 'AbortError')
-            }
+            // 移除 data: 前缀
+            let content = line.startsWith('data:') ? line.slice(5) : line
+            if (!content.trim()) continue
 
-            // 处理SSE格式的流式响应
-            let content = ''
+            try {
+              // 解析外层JSON
+              const outerJson = JSON.parse(content)
 
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6).trim()
-              if (data === '[DONE]' || data === '') continue
+              // 检查是否是流式数据事件 (event_type: 2001)
+              if (outerJson.event_type === 2001 && outerJson.event_data) {
+                // 解析 event_data (它是一个JSON字符串)
+                const eventData = JSON.parse(outerJson.event_data)
 
-              try {
-                // 尝试解析为JSON格式
-                const parsed = JSON.parse(data)
-                content = parsed.choices?.[0]?.delta?.content || parsed.content || parsed.text || ''
-              } catch (e) {
-                // 如果不是JSON格式，检查是否包含多个data:前缀
-                if (data.includes('data:')) {
-                  // 移除所有data:前缀，只保留实际内容
-                  content = data.replace(/data:/g, '')
-                } else {
-                  content = data
+                // 检查是否是增量数据
+                if (eventData.is_delta === true && eventData.message?.content) {
+                  // 解析 content (又是一个JSON字符串)
+                  const messageContent = JSON.parse(eventData.message.content)
+
+                  // 提取实际的文本内容
+                  if (messageContent.text) {
+                    const text = messageContent.text
+                    fullContent += text
+                    onChunk?.(text)
+                  }
                 }
               }
-            } else if (!line.startsWith('event:') && !line.startsWith('id:') && !line.startsWith('retry:')) {
-              // 处理非SSE格式��普通文本流
-              // 也要检查是否包含data:前缀
-              if (line.includes('data:')) {
-                content = line.replace(/data:/g, '')
-              } else {
-                content = line
-              }
-            }
+              // 忽略其他类型的事件 (如 event_type: 2002, 2003 等)
 
-            if (content && content.trim()) {
-              fullContent += content
-              // 实时回调每个chunk
-              onChunk?.(content)
+            } catch (parseError) {
+              // 如果JSON解析失败，跳过这行
+              console.warn('JSON解析失败:', parseError, 'content:', content)
+              continue
             }
           }
         }
 
-        return {
-          data: fullContent
-        }
+        return { data: fullContent }
       } finally {
         reader.releaseLock()
       }
     } catch (error: any) {
       console.error('流式请求失败:', error)
       
-      // 如果是取消错误，重新抛出以便上层处理
       if (error.name === 'AbortError') {
         throw error
       }
-      
+
       return {
+        data: '抱歉，服务暂时不可用，请稍后重试。',
         error: error.message
       }
     }

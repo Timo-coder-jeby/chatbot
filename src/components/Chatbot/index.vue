@@ -152,7 +152,7 @@ const loadCurrentMessages = async (key: string) => {
     const aiMessageRegex = /AiMessage \{ text = "([\s\S]*?)" toolExecutionRequests/
 
     // 单次遍历处理所有消息 - O(n) 时间复杂度
-    const messages = response.reduce<MessageItem[]>((acc, item) => {
+    const messages = response.reduce<MessageItem[]>((acc, item, index) => {
       if (item.type === 'SYSTEM') return acc // 过滤系统消息
 
       let content = ''
@@ -167,7 +167,7 @@ const loadCurrentMessages = async (key: string) => {
       }
 
       acc.push({
-        key: `${item.type.toLowerCase()}-${item.timestamp}`,
+        key: `${item.type.toLowerCase()}-${item.timestamp}-${index}-${Math.random().toString(36).substr(2, 9)}`, // 添加随机字符串确保唯一性
         role: item.type === 'USER' ? 'user' : 'assistant',
         content,
         timestamp: item.timestamp

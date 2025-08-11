@@ -145,7 +145,7 @@ const optimizedMd = new MarkdownIt({
     }
     return optimizedMd.utils.escapeHtml(str)
   }
-})
+}).enable('table');
 
 // 简化高效的 Markdown 渲染函数
 const renderMarkdown = (content: string) => {
@@ -183,7 +183,7 @@ const renderMarkdown = (content: string) => {
       .replace(/<ul>/g, '<ul style="margin: 12px 0; padding-left: 20px;">')
       .replace(/<ol>/g, '<ol style="margin: 12px 0; padding-left: 20px;">')
       .replace(/<li>/g, '<li style="margin: 4px 0; line-height: 1.5;">')
-      .replace(/<pre>/g, '<pre style="margin: 16px 0; padding: 16px; background: #f8f9fa; border-radius: 6px; overflow-x: auto; font-size: 14px; line-height: 1.4;">')
+      .replace(/<pre>/g, '<pre>')
       .replace(/<code>/g, '<code>')
 
     return h('div', {
