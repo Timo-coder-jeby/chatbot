@@ -411,28 +411,28 @@ defineExpose({
           }
 
 
-          pre {
-            margin: 18px 0;
-            border-radius: 8px;
-            overflow-x: auto;
-            background: #1e293b !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-            code {
-              background: transparent;
-              color: #fff;
-              padding: 18px;
-              display: block;
-              border-radius: 8px;
-              font-size: 13px;
-              line-height: 1.5;
-              font-weight: normal;
-
-              &.hljs {
-                color: #e2e8f0;
-              }
-            }
-          }
+          //pre {
+          //  margin: 18px 0;
+          //  border-radius: 8px;
+          //  overflow-x: auto;
+          //  background: #1e293b !important;
+          //  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          //
+          //  code {
+          //    background: transparent;
+          //    color: #fff;
+          //    padding: 18px;
+          //    display: block;
+          //    border-radius: 8px;
+          //    font-size: 13px;
+          //    line-height: 1.5;
+          //    font-weight: normal;
+          //
+          //    &.hljs {
+          //      color: #e2e8f0;
+          //    }
+          //  }
+          //}
 
           table {
             width: 100%;
