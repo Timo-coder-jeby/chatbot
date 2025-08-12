@@ -104,7 +104,8 @@ class AIService implements IAIService {
     signal?: AbortSignal
   ): Promise<AIResponse> {
     try {
-      const response = await fetch(`${this.config.baseURL}/post/stream/flux1`, {
+      // const response = await fetch(`${this.config.baseURL}/post/stream/flux1`, {
+      const response = await fetch(`${this.config.baseURL}/post/stream/chatFaRui`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.config.apiKey}`,
