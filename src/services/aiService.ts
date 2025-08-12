@@ -149,20 +149,22 @@ class AIService implements IAIService {
             if (!content.trim()) continue
 
             try {
-              // 解析外层JSON
-              const outerJson = JSON.parse(content)
+              // 解析JSON
+              const parsedData = JSON.parse(content)
 
-              // 检查是否是流式数据事件 (event_type: 2001)
-              if (outerJson.event_type === 2001 && outerJson.event_data) {
-                // 解析 event_data (它是一个JSON字符串)
-                const eventData = JSON.parse(outerJson.event_data)
+              // 兼容两种数据格式
+              if (parsedData.type === 'ai_message' && parsedData.message) {
+                // 新格式：直接从 message 字段获取文本
+                const text = parsedData.message
+                fullContent += text
+                onChunk?.(text)
+              } else if (parsedData.event_type === 2001 && parsedData.event_data) {
+                // 原格式：复杂的嵌套JSON结构
+                const eventData = JSON.parse(parsedData.event_data)
 
-                // 检查是否是增量数据
                 if (eventData.is_delta === true && eventData.message?.content) {
-                  // 解析 content (又是一个JSON字符串)
                   const messageContent = JSON.parse(eventData.message.content)
 
-                  // 提取实际的文本内容
                   if (messageContent.text) {
                     const text = messageContent.text
                     fullContent += text
@@ -170,7 +172,7 @@ class AIService implements IAIService {
                   }
                 }
               }
-              // 忽略其他类型的事件 (如 event_type: 2002, 2003 等)
+              // 忽略其他类型的事件 (如 start, complete 等)
 
             } catch (parseError) {
               // 如果JSON解析失败，跳过这行
