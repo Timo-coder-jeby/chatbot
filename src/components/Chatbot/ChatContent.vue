@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-content">
+  <div class="chat-content" :class="{ 'has-iframe': iframeVisible }">
     <!-- 聊天消息区域 -->
     <div class="chat-messages" v-if="allMessages.length > 0" ref="chatMessagesRef">
       <div v-for="message in allMessages" :key="message.key" class="message-item">
@@ -42,6 +42,14 @@
           v-model:value="inputValue"
       />
     </div>
+
+    <!-- IframeCot 组件 - 抽屉式显示 -->
+    <IframeCot
+      :visible="iframeVisible"
+      :url="iframeUrl"
+      :title="iframeTitle"
+      @close="iframeVisible = false"
+    />
   </div>
 </template>
 
@@ -53,6 +61,7 @@ import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github.css'
 import robotImg from '@/assets/icons/robots.png'
+import IframeCot from './IframeCot.vue'
 
 type Props = {
   messages: MessageItem[];
@@ -72,6 +81,11 @@ const emit = defineEmits<{
 const chatMessagesRef = ref<HTMLElement>()
 const inputValue = ref(props.senderValue)
 const currentAIContent = ref('')
+
+// IframeCot 相关状态
+const iframeVisible = ref(false)
+const iframeUrl = ref('')
+const iframeTitle = ref('')
 
 // 统一的消息列表 - 包含正常消息和typing状态
 const allMessages = computed(() => {
@@ -174,6 +188,12 @@ const renderMarkdown = (content: string) => {
   }
 
   try {
+    // 在渲染前清理可能导致代码块误判的空白
+    processedContent = processedContent
+      .split('\n')
+      .map(line => line.replace(/^\s{4,}/, '')) // 移除行首4+空格，避免被误识别为代码块
+      .join('\n')
+
     let htmlContent = optimizedMd.render(processedContent)
 
     // 简化的HTML后处理
@@ -194,6 +214,23 @@ const renderMarkdown = (content: string) => {
         fontSize: '14px',
         color: '#374151',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      },
+      onClick: (event: Event) => {
+        const target = event.target as HTMLElement
+        // 检查点击的是否是链接
+        if (target.tagName === 'A' && target instanceof HTMLAnchorElement) {
+          event.preventDefault()
+          const url = target.href
+          const title = target.textContent || target.title || '外部链接'
+
+          // 检查是否是外部链接（不是相对路径或锚点）
+          if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+            openIframe(url, title)
+          } else {
+            // 如果不是外部链接，使用默认行为
+            window.open(url, '_blank')
+          }
+        }
       }
     })
   } catch (error) {
@@ -227,6 +264,13 @@ const onCancel = () => {
   emit('cancel-conversation')
 }
 
+// 打开 IframeCot 组件
+const openIframe = (url: string, title: string) => {
+  iframeUrl.value = url
+  iframeTitle.value = title
+  iframeVisible.value = true
+}
+
 watch(() => props.messages, () => {
   scrollToBottom()
 }, { deep: true })
@@ -240,7 +284,8 @@ watch(() => props.isTyping, () => {
 // 暴露方法给父组件
 defineExpose({
   scrollToBottom,
-  updateAIContent
+  updateAIContent,
+  openIframe
 })
 </script>
 
@@ -284,6 +329,13 @@ defineExpose({
   grid-template-rows: 1fr auto;
   overflow: hidden;
   position: relative;
+  width: 100%;
+  transition: width 0.3s ease;
+
+  //// 当有iframe时，调整宽度为50%
+  //&.has-iframe {
+  //  width: 50%;
+  //}
 
   .chat-messages {
     grid-row: 1;
@@ -533,6 +585,19 @@ defineExpose({
     -webkit-text-fill-color: transparent;
     background-clip: text;
     animation: pulse 3s ease-in-out infinite;
+  }
+
+  // 响应式设计
+  @media (max-width: 768px) {
+    &.has-iframe {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    &.has-iframe {
+      width: 40%;
+    }
   }
 }
 

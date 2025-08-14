@@ -39,7 +39,8 @@ interface MessageItem {
 interface IAIService {
   createMessage(): Promise<AIResponse>
   sendMessageStream(
-    data: StreamParams,
+    url?: string,
+    data?: StreamParams,
     onChunk?: (chunk: string) => void,
     signal?: AbortSignal
   ): Promise<AIResponse>
@@ -99,13 +100,14 @@ class AIService implements IAIService {
 
   // 流式响应
   async sendMessageStream(
+    url: string = '/post/stream/flux1',
     data: StreamParams,
     onChunk?: (chunk: string) => void,
     signal?: AbortSignal
   ): Promise<AIResponse> {
     try {
       // const response = await fetch(`${this.config.baseURL}/post/stream/flux1`, {
-      const response = await fetch(`${this.config.baseURL}/post/stream/chatFaRui`, {
+      const response = await fetch(`${this.config.baseURL}${url}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.config.apiKey}`,
@@ -153,7 +155,10 @@ class AIService implements IAIService {
               const parsedData = JSON.parse(content)
 
               // 兼容两种数据格式
-              if (parsedData.type === 'ai_message' && parsedData.message) {
+              if (
+                (parsedData.type == 'ai_message' || parsedData.type == 'legal_advice_data')
+                && parsedData.message
+              ) {
                 // 新格式：直接从 message 字段获取文本
                 const text = parsedData.message
                 fullContent += text

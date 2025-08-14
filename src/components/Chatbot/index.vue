@@ -12,7 +12,7 @@
     <div class="main-content">
       <!-- 顶部标题 -->
       <div class="chat-header">
-        <a-upload
+        <!--<a-upload
           :action="BASEURL + '/document/load/file'"
           @change="uploadChange"
           name="files"
@@ -22,7 +22,32 @@
             ghost
             :icon="h(SettingOutlined)"
           >RAG DATA</a-button>
-        </a-upload>
+        </a-upload>-->
+        <a-dropdown :trigger="['click']">
+          <a-button
+            type="primary"
+            size="middle"
+            ghost
+            @click.prevent
+          >
+            {{ techMenu[curMenuIndex]?.title }}
+            <DownOutlined />
+          </a-button>
+          <template #overlay>
+            <a-menu
+              :openKeys="[techMenu[curMenuIndex]?.key]"
+            >
+              <a-menu-item
+                v-for="(item,index) in techMenu"
+                :key="item.key"
+                @click="() => curMenuIndex = index"
+                :icon="item.icon"
+                :title="item.title"
+                :style="{color: index == curMenuIndex ? '#1677ff' : ''}"
+              >{{ item.title }}</a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
       </div>
 
       <!-- 聊天内容区域 -->
@@ -41,7 +66,13 @@
 <script setup lang="ts">
 import {ref, computed, reactive, inject, h, onMounted, nextTick} from 'vue'
 import { message } from "ant-design-vue";
-import { SettingOutlined } from '@ant-design/icons-vue'
+import {
+  SettingOutlined,
+  DownOutlined,
+  MessageOutlined,
+  FileSearchOutlined,
+  SearchOutlined
+} from '@ant-design/icons-vue'
 import { type IAIService, type ConversationItem, type MessageItem } from '@/services/aiService.ts'
 
 import SideBar from "./SideBar.vue";
@@ -54,6 +85,27 @@ const activeConversationKey = ref('conv-1')
 const isTyping = ref(false)
 const senderValue = ref('')
 const chatContentRef = ref<InstanceType<typeof ChatContent>>()
+const techMenu = ref([
+  {
+    key: 'advisory',
+    title: '法律咨询',
+    icon: h(MessageOutlined),
+    apiBase: '/farui/legalAdvice/consult'
+  },
+  {
+    key: 'index-law',
+    title: '法律检索',
+    icon: h(SearchOutlined),
+    apiBase: '/farui/search/law/query'
+  },
+  {
+    key: 'index-case',
+    title: '案例检索',
+    icon: h(FileSearchOutlined),
+    apiBase: '/farui/search/case/fulltext'
+  },
+])
+const curMenuIndex = ref(0)
 
 // 对话列表 - 直接从接口获取
 const conversationList = reactive<ConversationItem[]>([])
@@ -77,20 +129,38 @@ const loadConversationList = async () => {
       // 一次性映射和排序，减少遍历次数
       const mappedSessions = sessions
         .map((session: any) => ({
-          key: session.session_id,
+          key: session.sessionId,
           label: session.title
             ? (session.title.replace(/\r\n/g, '').slice(0, 30) + (session.title.length > 30 ? '...' : ''))
             : '新建对话',
-          timestamp: new Date(session.create_time || session.createTime).getTime(),
-          sessionKey: session.session_id
+          timestamp: new Date(session.createTime || session.createTime).getTime(),
+          sessionKey: session.sessionId
         }))
+      if (mappedSessions.length > 0) {
+        // 直接替换整个数组
+        conversationList.splice(0, conversationList.length, ...mappedSessions)
 
-      // 直接替换整个数组
-      conversationList.splice(0, conversationList.length, ...mappedSessions)
-
-      // 设置第一个对话为活跃对话并加载其消息
-      activeConversationKey.value = mappedSessions[0].key
-      await loadCurrentMessages(mappedSessions[0].key)
+        // 确保设置有效的activeConversationKey
+        const firstSessionKey = mappedSessions[0].key
+        if (firstSessionKey) {
+          activeConversationKey.value = firstSessionKey
+          await loadCurrentMessages(firstSessionKey)
+        } else {
+          // 如果第一个session的key无效，设置默认值
+          activeConversationKey.value = 'conv-1'
+          currentMessages.value = []
+        }
+      } else {
+        // 如果没有有效的session，设置默认对话
+        const defaultConversation: ConversationItem = {
+          key: 'conv-1',
+          label: '新建对话',
+          timestamp: Date.now()
+        }
+        conversationList.splice(0, conversationList.length, defaultConversation)
+        activeConversationKey.value = 'conv-1'
+        currentMessages.value = []
+      }
     } else {
       // 如果接口返回空数组，直接替换为默认对话
       const defaultConversation: ConversationItem = {
@@ -104,6 +174,7 @@ const loadConversationList = async () => {
     }
   } catch (error) {
     console.error('获取对话失败:', error)
+    // 确保在错误情况下也有默认值
     if (conversationList.length === 0) {
       const defaultConversation: ConversationItem = {
         key: 'conv-1',
@@ -111,8 +182,10 @@ const loadConversationList = async () => {
         timestamp: Date.now()
       }
       conversationList.splice(0, conversationList.length, defaultConversation)
-      activeConversationKey.value = 'conv-1'
-      currentMessages.value = []
+    }
+    // 确保activeConversationKey有值
+    if (!activeConversationKey.value) {
+      activeConversationKey.value = conversationList[0]?.key || 'conv-1'
     }
   }
 }
@@ -292,8 +365,9 @@ const handleSendMessage = async (message: string) => {
   let aiMessageAdded = false
 
   try {
-    // 使用流式响应，传入 signal
+    // 使用流式响��，传入 signal
     await aiService.sendMessageStream(
+      techMenu.value[curMenuIndex.value].apiBase ?? undefined,
       {
         sessionId: currentConversation.sessionKey ?? '',
         question: message
