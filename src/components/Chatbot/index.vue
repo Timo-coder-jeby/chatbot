@@ -36,6 +36,10 @@
       <Case
         v-else
         :curMenuItem="curMenuItem"
+        :conversationList="conversationList"
+        :activeConversationKey="activeConversationKey"
+        :currentMessages="currentMessages"
+        @send-message="handleSendMessage"
       />
     </div>
   </div>
@@ -204,6 +208,7 @@ const loadCurrentMessages = async (key: string) => {
   }
 
   try {
+    // const response = await aiService.get(`/chat/session/messages/${key}/${curMenuItem?.value?.type}`)
     const response = await aiService.get(`/chat/session/messages/${key}`)
 
     if (!response || !Array.isArray(response)) {
