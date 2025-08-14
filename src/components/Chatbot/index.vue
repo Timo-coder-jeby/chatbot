@@ -68,6 +68,7 @@ const techMenu = ref([
     title: '法律咨询',
     icon: h(MessageOutlined),
     apiBase: '/farui/legalAdvice/consult',
+    apiType: 'stream',
     type: 'consult'
   },
   {
@@ -75,6 +76,7 @@ const techMenu = ref([
     title: '法律检索',
     icon: h(SearchOutlined),
     apiBase: '/farui/search/law/query',
+    apiType: 'ajax',
     type: 'law'
   },
   {
@@ -82,6 +84,7 @@ const techMenu = ref([
     title: '案例检索',
     icon: h(FileSearchOutlined),
     apiBase: '/farui/search/case/fulltext',
+    apiType: 'ajax',
     type: 'case'
   },
 ])
@@ -320,8 +323,8 @@ const handleSendMessage = async (message: string) => {
 
   // 如果没有sessionKey，先创建会话
   if (!currentConversation.sessionKey) {
-    const response = await aiService.createMessage()
-    currentConversation.sessionKey = response.sessionId || `session-${Date.now()}`
+    const response = await aiService.createMessage(curMenuItem.value.type)
+    currentConversation.sessionKey = response?.sessionId || `session-${Date.now()}`
   }
 
   // 添加用户消息

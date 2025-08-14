@@ -14,6 +14,7 @@ interface AIResponse {
   params?: any
   type?: string
   error?: string
+  sessionId?: string
 }
 
 type StreamParams = {
@@ -39,7 +40,7 @@ interface MessageItem {
 
 // AI 服务接口约束
 interface IAIService {
-  createMessage(): Promise<AIResponse>
+  createMessage(type?: string): Promise<AIResponse>
   sendMessageStream(
     url?: string,
     data?: StreamParams,
@@ -61,7 +62,7 @@ class AIService implements IAIService {
   }
 
   // 创建新会话
-  async createMessage(type): Promise<AIResponse> {
+  async createMessage(type?: string): Promise<AIResponse> {
     try {
       // 这里可以替换为不同的 AI 服务 (OpenAI, Claude, 本地模型等)
       const response = await axios.get(
@@ -86,7 +87,7 @@ class AIService implements IAIService {
       } else if (error.response?.status === 429) {
         errorMessage = '请求过于频繁，请稍后重试。'
       } else if (error.code === 'ECONNABORTED') {
-        errorMessage = '请求��时，请检查网络连接。'
+        errorMessage = '请求超时，请检查网络连接。'
       }
 
       return {
