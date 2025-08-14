@@ -1,57 +1,29 @@
 <template>
-  <div class="chat-container">
+  <div class="grid grid-cols-[290px_1fr] grid-rows-1 gap-4 h-screen w-screen p-4 bg-gradient-to-br from-red-50 via-rose-50 to-red-100 relative overflow-hidden">
+    <!-- 背景装饰效果 -->
+    <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_1px_1px,rgba(239,68,68,0.15)_1px,transparent_0)] bg-[length:25px_25px] animate-pulse"></div>
+
+    <!-- 浮动光晕效果 -->
+    <div class="absolute top-1/5 right-[15%] w-72 h-72 bg-gradient-radial from-red-200/30 to-transparent rounded-full animate-float opacity-50"></div>
+    <div class="absolute bottom-1/4 left-[10%] w-48 h-48 bg-gradient-radial from-rose-200/20 to-transparent rounded-full animate-float delay-1000 opacity-40"></div>
+
     <!-- 左侧对话列表 -->
     <SideBar
       :conversationList="conversationList"
       :activeConversationKey="activeConversationKey"
+      :techMenu="techMenu"
+      :curMenuIndex="curMenuIndex"
       @create-new-chat="createNewChat"
       @conversation-change="handleConversationChange"
       @delete-conversation="deleteConversation"
+      @menu-change="handleMenuChange"
     />
-    <!-- 右侧聊天区域 -->
-    <div class="main-content">
-      <!-- 顶部标题 -->
-      <div class="chat-header">
-        <!--<a-upload
-          :action="BASEURL + '/document/load/file'"
-          @change="uploadChange"
-          name="files"
-        >
-          <a-button
-            type="primary"
-            ghost
-            :icon="h(SettingOutlined)"
-          >RAG DATA</a-button>
-        </a-upload>-->
-        <a-dropdown :trigger="['click']">
-          <a-button
-            type="primary"
-            size="middle"
-            ghost
-            @click.prevent
-          >
-            {{ techMenu[curMenuIndex]?.title }}
-            <DownOutlined />
-          </a-button>
-          <template #overlay>
-            <a-menu
-              :openKeys="[techMenu[curMenuIndex]?.key]"
-            >
-              <a-menu-item
-                v-for="(item,index) in techMenu"
-                :key="item.key"
-                @click="() => curMenuIndex = index"
-                :icon="item.icon"
-                :title="item.title"
-                :style="{color: index == curMenuIndex ? '#1677ff' : ''}"
-              >{{ item.title }}</a-menu-item>
-            </a-menu>
-          </template>
-        </a-dropdown>
-      </div>
 
-      <!-- 聊天内容区域 -->
+    <!-- 右侧聊天区域 -->
+    <div class="col-start-2 row-start-1 grid grid-rows-[auto_1fr] bg-white/95 backdrop-blur-xl relative z-10 rounded-3xl shadow-2xl border border-red-100/30 overflow-hidden">
+      <!-- 法律咨询时显示聊天内容 -->
       <ChatContent
+        v-if="curMenuItem.type === 'consult'"
         :messages="currentMessages"
         :isTyping="isTyping"
         v-model:senderValue="senderValue"
@@ -59,16 +31,20 @@
         @cancel-conversation="handleCancelConversation"
         ref="chatContentRef"
       />
+
+      <!-- 法律检索和案例检索时显示Case组件 -->
+      <Case
+        v-else
+        :curMenuItem="curMenuItem"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref, computed, reactive, inject, h, onMounted, nextTick} from 'vue'
+import {ref, computed, reactive, inject, h, onMounted, nextTick, watch} from 'vue'
 import { message } from "ant-design-vue";
 import {
-  SettingOutlined,
-  DownOutlined,
   MessageOutlined,
   FileSearchOutlined,
   SearchOutlined
@@ -77,6 +53,7 @@ import { type IAIService, type ConversationItem, type MessageItem } from '@/serv
 
 import SideBar from "./SideBar.vue";
 import ChatContent from "./ChatContent.vue";
+import Case from "./Case.vue";
 
 const aiService = inject<IAIService>('aiService')!
 
@@ -126,7 +103,15 @@ onMounted(() => {
  */
 const loadConversationList = async () => {
   try {
-    const { sessions } = await aiService.get('/chat/sessions')
+    // 根据当前菜单类型构建请求参数
+    const requestParams: any = {}
+    if (curMenuItem.value?.type) {
+      requestParams.type = curMenuItem.value.type
+    }
+
+    // 如果有type参数，作为查询参数传递
+    const queryString = requestParams.type ? `?type=${requestParams.type}` : ''
+    const { sessions } = await aiService.get(`/chat/sessions${queryString}`)
 
     // 直接替换整个数组而不是逐个push，减少数组操作次数
     if (Array.isArray(sessions) && sessions.length > 0) {
@@ -289,7 +274,7 @@ const handleConversationChange = async (key: string) => {
 }
 
 /**
- * 删除对话
+ * 删除会话
  */
 const deleteConversation = async (key: string) => {
   if (conversationList.length <= 1) return
@@ -335,8 +320,8 @@ const handleSendMessage = async (message: string) => {
 
   // 如果没有sessionKey，先创建会话
   if (!currentConversation.sessionKey) {
-    const { sessionId } = await aiService.createMessage(curMenuItem?.value?.type)
-    currentConversation.sessionKey = sessionId
+    const response = await aiService.createMessage()
+    currentConversation.sessionKey = response.sessionId || `session-${Date.now()}`
   }
 
   // 添加用户消息
@@ -457,6 +442,17 @@ const uploadChange = ({file}:any) => {
 // 自动滚动到底部
 const scrollToBottom = () => {
   chatContentRef.value?.scrollToBottom()
+}
+
+// 处理菜单切换
+const handleMenuChange = async (index: number) => {
+  curMenuIndex.value = index
+
+  // 清空当前消息
+  currentMessages.value = []
+
+  // 无论切换到哪个技术类型，都重新加载会话列表
+  await loadConversationList()
 }
 </script>
 
