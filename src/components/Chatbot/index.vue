@@ -90,22 +90,26 @@ const techMenu = ref([
     key: 'advisory',
     title: '法律咨询',
     icon: h(MessageOutlined),
-    apiBase: '/farui/legalAdvice/consult'
+    apiBase: '/farui/legalAdvice/consult',
+    type: 'consult'
   },
   {
     key: 'index-law',
     title: '法律检索',
     icon: h(SearchOutlined),
-    apiBase: '/farui/search/law/query'
+    apiBase: '/farui/search/law/query',
+    type: 'law'
   },
   {
     key: 'index-case',
     title: '案例检索',
     icon: h(FileSearchOutlined),
-    apiBase: '/farui/search/case/fulltext'
+    apiBase: '/farui/search/case/fulltext',
+    type: 'case'
   },
 ])
 const curMenuIndex = ref(0)
+const curMenuItem = computed(() => techMenu.value[curMenuIndex.value])
 
 // 对话列表 - 直接从接口获取
 const conversationList = reactive<ConversationItem[]>([])
@@ -331,8 +335,8 @@ const handleSendMessage = async (message: string) => {
 
   // 如果没有sessionKey，先创建会话
   if (!currentConversation.sessionKey) {
-    const { data: sessionKey } = await aiService.createMessage()
-    currentConversation.sessionKey = sessionKey
+    const { sessionId } = await aiService.createMessage(curMenuItem?.value?.type)
+    currentConversation.sessionKey = sessionId
   }
 
   // 添加用户消息

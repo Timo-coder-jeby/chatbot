@@ -1,4 +1,4 @@
-import axios,{ type Axios } from 'axios'
+import axios, {type Axios} from 'axios'
 
 // AI 服务配置
 interface AIConfig {
@@ -11,6 +11,8 @@ interface AIConfig {
 // AI 响应类型
 interface AIResponse {
   data?: string
+  params?: any
+  type?: string
   error?: string
 }
 
@@ -59,7 +61,7 @@ class AIService implements IAIService {
   }
 
   // 创建新会话
-  async createMessage(): Promise<AIResponse> {
+  async createMessage(type): Promise<AIResponse> {
     try {
       // 这里可以替换为不同的 AI 服务 (OpenAI, Claude, 本地模型等)
       const response = await axios.get(
@@ -69,15 +71,11 @@ class AIService implements IAIService {
             'Authorization': `Bearer ${this.config.apiKey}`,
             'Content-Type': 'application/json'
           },
-          timeout: 30000 // 30秒超时
+          timeout: 30000, // 30秒超时
+          params: {type}
         }
       )
-
-      const aiMessage = response.data.data ?? response?.data
-
-      return {
-        data: aiMessage
-      }
+      return response.data.data ?? response?.data
     } catch (error: any) {
       console.error('AI服务请求失败:', error)
 
