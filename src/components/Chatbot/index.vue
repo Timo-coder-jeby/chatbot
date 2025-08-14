@@ -357,7 +357,7 @@ const handleSendMessage = async (message: string) => {
   let aiMessageAdded = false
 
   try {
-    // 使用流式响��，传入 signal
+    // 使用流式响应，传入 signal
     await aiService.sendMessageStream(
       techMenu.value[curMenuIndex.value].apiBase ?? undefined,
       {
