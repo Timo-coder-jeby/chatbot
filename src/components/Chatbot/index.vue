@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, reactive, inject, h, onMounted, nextTick, watch} from 'vue'
+import {ref, computed, reactive, inject, h, onMounted, nextTick} from 'vue'
 import { message } from "ant-design-vue";
 import {
   MessageOutlined,

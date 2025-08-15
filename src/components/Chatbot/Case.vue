@@ -74,7 +74,7 @@ const loadHistoryResults = async () => {
   isSearching.value = true
   try {
     // 直接调用搜索接口获取历史结果
-    const response = await aiService.get(`/chat/session/messages/${props.activeConversationKey}/${props?.curMenuItem?.type}`)
+    const response = await aiService.get(`/chat/session/messages/${props.activeConversationKey}`)
     searchResults.value = response?.results || response?.data || []
   } catch (error) {
     console.error('加载历史搜索结果失败:', error)
