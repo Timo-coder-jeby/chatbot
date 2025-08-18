@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, inject, computed, watch } from 'vue'
-import { SearchOutlined, FileSearchOutlined, DownOutlined } from '@ant-design/icons-vue'
+import { SearchOutlined, FileSearchOutlined, DownOutlined,ClockCircleOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { type IAIService } from '@/services/aiService.ts'
 
 const aiService = inject<IAIService>('aiService')!
+import serviceData from './data.json'
 
 // Props定义
 type Props = {
@@ -27,10 +28,18 @@ const emit = defineEmits<{
   'send-message': [message: string]
 }>()
 
+const SORT_OPTIONS = [
+  { label: '相关性', value: 'similarity' },
+  { label: '发布时间', value: 'releaseDate' },
+  { label: '实施时间', value: 'implementDate' }
+]
+
 // 搜索相关状态
 const searchValue = ref('')
 const searchResults = ref<any[]>([])
 const isSearching = ref(false)
+const serviceResult:any = ref(null)
+const sortRule = ref('similarity')
 const currentPage = ref(1)
 const pageSize = ref(10)
 
@@ -73,9 +82,47 @@ const loadHistoryResults = async () => {
 
   isSearching.value = true
   try {
-    // 直接调用搜索接口获取历史结果
-    const response = await aiService.get(`/chat/session/messages/${props.activeConversationKey}`)
-    searchResults.value = response?.results || response?.data || []
+    // 获取历史会话消息
+    // const response = await aiService.get(`/chat/session/messages/${currentConversation.value.sessionKey}`)
+
+    const response = serviceData.data
+    serviceResult.value = response
+    console.log('🥶',response);
+    // 处理您提供的法规搜索数据结构
+    if (response?.lawResult && Array.isArray(response.lawResult)) {
+      // 直接使用 lawResult 数组
+      searchResults.value = response.lawResult
+    } else if (Array.isArray(response)) {
+      // 从消息数组中查找包含法规数据的消息
+      const searchMessages = response.filter(msg =>
+        msg.type === 'AI' && msg.text && (
+          msg.text.includes('lawResult') ||
+          msg.text.includes('lawDomain') ||
+          msg.text.includes('currentPage') ||
+          msg.text.includes('totalCount')
+        )
+      )
+
+      if (searchMessages.length > 0) {
+        // 尝试从最新的搜索消息中解析数据
+        const latestSearchMsg = searchMessages[searchMessages.length - 1]
+        try {
+          const parsed = JSON.parse(latestSearchMsg.text)
+          if (parsed.lawResult && Array.isArray(parsed.lawResult)) {
+            searchResults.value = parsed.lawResult
+          } else {
+            searchResults.value = []
+          }
+        } catch (parseError) {
+          console.warn('解析历史搜索结果失败:', parseError)
+          searchResults.value = []
+        }
+      } else {
+        searchResults.value = []
+      }
+    } else {
+      searchResults.value = []
+    }
   } catch (error) {
     console.error('加载历史搜索结果失败:', error)
     searchResults.value = []
@@ -152,10 +199,49 @@ const handleSuggestedSearch = (term: string) => {
   searchValue.value = term
   handleSearch()
 }
+
+// 格式化法规数据用于显示
+const formatLawData = (item: any) => {
+  const lawDomain = item.lawDomain || {}
+  const potencyLevels = lawDomain?.potencyLevel ? JSON.parse(lawDomain.potencyLevel) : {}
+  return {
+    title: lawDomain.lawName || lawDomain.lawTitle || '未知法规',
+    content: lawDomain.lawSourceContent || '',
+    similarity: item.similarity || '0',
+    issuingOrgan: (lawDomain.issuingOrgan && JSON.parse(lawDomain.issuingOrgan)) || '',
+    issuingNo: lawDomain.issuingNo || '',
+    releaseDate: lawDomain.releaseYearMonthDate || '',
+    implementDate: lawDomain.implementYearMonthDate || '',
+    potencyLevels,
+    timeliness: lawDomain.timeliness || '',
+    thematicClassify: lawDomain.thematicClassify || ''
+  }
+}
+
+// 获取时效性颜色
+const getTimelinessColor = (timeliness: string) => {
+  const colorMap: Record<string, string> = {
+    '现行有效': 'green',
+    '已废止': 'red',
+    '已失效': 'orange',
+    '已修改': 'blue'
+  }
+  return colorMap[timeliness] || 'default'
+}
+
+// 格式化日期
+const formatDate = (dateString: string) => {
+  if (!dateString) return ''
+  try {
+    return new Date(dateString).toLocaleDateString('zh-CN')
+  } catch {
+    return dateString
+  }
+}
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-gray-50">
+  <div class="flex flex-col flex-1 bg-gray-50 overflow-hidden case-box">
     <!-- 头部 -->
     <div class="flex-shrink-0 p-6 bg-white border-b border-gray-200">
       <div class="flex items-center gap-4">
@@ -172,7 +258,7 @@ const handleSuggestedSearch = (term: string) => {
     </div>
 
     <!-- 主内容区域 -->
-    <div class="flex-1 overflow-hidden">
+    <div class="flex-1 overflow-y-auto">
       <!-- 新会话：显示搜索框 -->
       <div v-if="isNewConversation" class="flex items-center justify-center h-full p-8">
         <div class="w-full max-w-2xl text-center">
@@ -212,114 +298,79 @@ const handleSuggestedSearch = (term: string) => {
 
       <!-- 历史会话：显示搜索结果列表 -->
       <div v-else class="h-full flex flex-col">
-        <!-- 搜索框区域 -->
-        <div class="p-4 bg-white border-b border-gray-200">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-medium text-gray-800 m-0">检索结果</h3>
-            <a-badge :count="searchResults.length" v-if="searchResults.length > 0" />
-          </div>
-
-          <div class="flex items-center gap-3">
-            <div class="flex-1 max-w-lg">
-              <a-input-search
-                v-model:value="searchValue"
-                :placeholder="`继续检索${curMenuItem.type === 'law' ? '法条' : '案例'}`"
-                enter-button="搜索"
-                :loading="isSearching"
-                @search="handleSearch"
-                allow-clear
-              />
-            </div>
-          </div>
-        </div>
-
         <!-- 搜索结果 -->
-        <div class="flex-1 overflow-y-auto p-4">
-          <!-- 加载状态 -->
-          <div v-if="isSearching" class="flex flex-col items-center justify-center h-48">
-            <a-spin size="large" />
-            <p class="mt-4 text-gray-600">正在检索中...</p>
-          </div>
+        <div class="h-full flex flex-col">
+          <div class="h-full p-4 w-full">
+            <!-- 加载状态 -->
+            <div v-if="isSearching" class="flex flex-col items-center justify-center h-48">
+              <a-spin size="large" />
+              <p class="mt-4 text-gray-600">正在检索中...</p>
+            </div>
 
-          <!-- 结果列表 -->
-          <div v-else-if="searchResults.length > 0">
-            <!-- 结果统计 -->
-            <div class="mb-4 p-3 bg-red-50 rounded-lg border border-red-100">
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-600">
-                  共���到 <span class="font-semibold text-red-600">{{ searchResults.length }}</span> 条相关结果
-                </span>
-                <a-dropdown placement="bottomRight">
-                  <template #overlay>
-                    <a-menu>
-                      <a-menu-item key="relevance">按相关性排序</a-menu-item>
-                      <a-menu-item key="time">按时间排序</a-menu-item>
-                      <a-menu-item key="source">按来源排序</a-menu-item>
-                    </a-menu>
+            <!-- 结果列表 -->
+            <div v-else-if="!!searchResults?.length" class="h-full flex flex-col">
+              <!-- 结果统计 -->
+              <div class="mb-4 p-3 bg-red-50 rounded-lg border border-red-100">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">
+                    <ClockCircleOutlined /><span class="font-semibold pl-2">{{ serviceResult?.query }}</span>
+                  </span>
+                  <a-select
+                    v-model:value="sortRule"
+                    class="w-[100px] border-none"
+                    :dropdownMatchSelectWidth="false"
+                  >
+                    <a-select-option
+                      v-for="option in SORT_OPTIONS"
+                      :key="option.value"
+                      :value="option.value"
+                      :title="option.label"
+                    >{{ option.label }}</a-select-option>
+                  </a-select>
+                </div>
+              </div>
+
+              <!-- 结果卡片列表  searchResults -->
+              <div class="flex-1 overflow-y-auto">
+                <a-list
+                  item-layout="vertical" size="large"  :data-source="searchResults"
+                >
+                  <template #renderItem="{item}">
+                    <a-list-item :key="item?.similarity">
+                      <a-list-item-meta>
+                        <template #title>
+                          <div class="flex items-center justify-between">
+                            <div class="text-blue-600">{{ formatLawData(item).title }}</div>
+                            <a-tag color="processing">{{ formatLawData(item).timeliness }}</a-tag>
+                          </div>
+                        </template>
+                        <template #description>
+                          <div>
+                            <div class="text-xs text-gray-400 divide-x divide-gray-300 flex items-center pb-2">
+                              <div class="px-2">{{ formatLawData(item).potencyLevels?.level1Name }}</div>
+                              <div class="px-2">{{ formatLawData(item).issuingOrgan?.level1Name }}</div>
+                              <div class="px-2">{{ formatLawData(item)?.issuingNo }}</div>
+                              <div class="px-2">{{ formatLawData(item).releaseDate }}公布</div>
+                              <div class="px-2">{{ formatLawData(item).implementDate }}施行</div>
+                            </div>
+                            <div class="bg-white rounded-md py-2 px-4 text-gray-700 text-xs border border-gray-100">{{ formatLawData(item).content }}</div>
+                          </div>
+                        </template>
+                      </a-list-item-meta>
+                    </a-list-item>
                   </template>
-                  <a-button type="text" size="small">
-                    ������ <DownOutlined />
-                  </a-button>
-                </a-dropdown>
+                </a-list>
               </div>
             </div>
 
-            <!-- 结果卡片列表 -->
-            <div class="space-y-3">
-              <div
-                v-for="(item, index) in searchResults"
-                :key="index"
-                class="bg-white rounded-lg border border-gray-200 p-4 hover:border-red-300 hover:shadow-md transition-all duration-200"
-              >
-                <!-- 标题 -->
-                <div class="flex items-start justify-between mb-3">
-                  <h4 class="text-base font-medium text-gray-800 leading-6 flex-1 pr-4">
-                    {{ item.title || item.name || `检索结果 ${index + 1}` }}
-                  </h4>
-                  <a-tag v-if="item.source" color="red" size="small">
-                    {{ item.source }}
-                  </a-tag>
-                </div>
-
-                <!-- 内容 -->
-                <p class="text-sm text-gray-600 leading-6 mb-3 line-clamp-3">
-                  {{ item.content || item.description || item.summary }}
-                </p>
-
-                <!-- 底部信息 -->
-                <div class="flex items-center justify-between text-xs text-gray-500">
-                  <div class="flex items-center gap-3">
-                    <span v-if="item.date">{{ item.date }}</span>
-                    <span v-if="item.category">{{ item.category }}</span>
-                  </div>
-                  <a-button type="link" size="small" class="!p-0 !h-auto">
-                    查看详情
-                  </a-button>
-                </div>
-              </div>
+            <!-- 空状态 -->
+            <div v-else class="h-64">
+              <a-empty :description="`暂无${curMenuItem.type === 'law' ? '法条' : '案例'}检索结果`">
+                <a-button type="primary" @click="searchValue = ''">
+                  开始搜索
+                </a-button>
+              </a-empty>
             </div>
-
-            <!-- 分页 -->
-            <div class="mt-6 flex justify-center">
-              <a-pagination
-                v-model:current="currentPage"
-                v-model:page-size="pageSize"
-                :total="searchResults.length"
-                :show-size-changer="false"
-                :show-quick-jumper="true"
-                size="default"
-                :show-total="(total, range) => `${range[0]}-${range[1]} / ${total}`"
-              />
-            </div>
-          </div>
-
-          <!-- 空状态 -->
-          <div v-else class="h-64">
-            <a-empty :description="`暂无${curMenuItem.type === 'law' ? '法条' : '案例'}检索结果`">
-              <a-button type="primary" @click="searchValue = ''">
-                开始搜索
-              </a-button>
-            </a-empty>
           </div>
         </div>
       </div>
@@ -327,6 +378,18 @@ const handleSuggestedSearch = (term: string) => {
   </div>
 </template>
 
-<style scoped>
-/* 移除所有复杂的科技感样式，使用简洁的默认样式 */
+<style scoped lang="scss">
+.case-box{
+  &:deep(.ant-select-selector){
+    border: none;
+    background: transparent;
+    .ant-select-selection-item{
+      color: #8f91a8;
+      font-weight: 600;
+    }
+  }
+  &:deep(.ant-select-focused .ant-select-selector) {
+    box-shadow: none !important;
+  }
+}
 </style>

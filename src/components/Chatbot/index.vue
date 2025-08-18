@@ -60,6 +60,7 @@ import ChatContent from "./ChatContent.vue";
 import Case from "./Case.vue";
 
 const aiService = inject<IAIService>('aiService')!
+import serviceData from './data.json'
 
 // 响应式数据
 const activeConversationKey = ref('conv-1')
@@ -209,7 +210,8 @@ const loadCurrentMessages = async (key: string) => {
 
   try {
     // const response = await aiService.get(`/chat/session/messages/${key}/${curMenuItem?.value?.type}`)
-    const response = await aiService.get(`/chat/session/messages/${key}`)
+    // const response = await aiService.get(`/chat/session/messages/${key}`)
+    const response = serviceData
 
     if (!response || !Array.isArray(response)) {
       currentMessages.value = []

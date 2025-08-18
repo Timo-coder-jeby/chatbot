@@ -68,5 +68,22 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/line-clamp'),
+    function({ addBase }) {
+      addBase({
+        // 确保 divide 工具类的边框样式
+        '.divide-x > :not(:first-child)': {
+          'border-left-width': '1px',
+          'border-left-style': 'solid',
+        },
+        '.divide-y > :not(:first-child)': {
+          'border-top-width': '1px',
+          'border-top-style': 'solid',
+        },
+        '.border': {
+          'border-width': '1px',
+          'border-style': 'solid',
+        }
+      })
+    }
   ],
 }
