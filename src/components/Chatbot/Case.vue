@@ -200,6 +200,7 @@ const handleSuggestedSearch = (term: string) => {
   searchValue.value = term
   handleSearch()
 }
+const stripRN = (str: string) => str.replace(/\\r\\n|\\r|\\n|[\r\n]/g, '')
 
 // 格式化法规数据用于显示
 const formatLawData = (item: any) => {
@@ -207,7 +208,7 @@ const formatLawData = (item: any) => {
   const potencyLevels = lawDomain?.potencyLevel ? JSON.parse(lawDomain.potencyLevel) : {}
   return {
     title: lawDomain.lawName || lawDomain.lawTitle || '未知法规',
-    content: lawDomain.lawSourceContent || '',
+    content: stripRN(lawDomain?.lawSourceContent || ''),
     similarity: item.similarity || '0',
     issuingOrgan: (lawDomain.issuingOrgan && JSON.parse(lawDomain.issuingOrgan)) || '',
     issuingNo: lawDomain.issuingNo || '',
@@ -354,7 +355,11 @@ const formatDate = (dateString: string) => {
                               <div class="px-2">{{ formatLawData(item).releaseDate }}公布</div>
                               <div class="px-2">{{ formatLawData(item).implementDate }}施行</div>
                             </div>
-                            <div class="bg-white rounded-md py-2 px-4 text-gray-700 text-xs border border-gray-100" v-html="formatLawData(item).content"></div>
+                            <div
+                              class="bg-white rounded-md py-2 px-4 text-gray-700 text-xs border border-gray-100"
+                              >
+                              <div class="m-0 p-0 line-clamp-[8]">{{ formatLawData(item).content }}</div>
+                            </div>
                           </div>
                         </template>
                       </a-list-item-meta>
