@@ -135,6 +135,7 @@ const handleMenuClick = (e: any, conversationKey: string) => {
         <a-button
           size="small"
           type="link"
+          danger
           class="text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg px-2"
           @click="createNewChat"
         >
