@@ -83,9 +83,9 @@ const loadHistoryResults = async () => {
   isSearching.value = true
   try {
     // 获取历史会话消息
-    // const response = await aiService.get(`/chat/session/messages/${currentConversation.value.sessionKey}`)
+    const response = await aiService.get(`/chat/session/messages/${currentConversation.value.sessionKey}`)
 
-    const response = serviceData.data
+    // const response = serviceData.data
     serviceResult.value = response
     console.log('🥶',response);
     // 处理您提供的法规搜索数据结构
@@ -146,6 +146,7 @@ const handleSearch = async () => {
 
   // 如果是新会话，使用 handleSendMessage 获取 sessionId
   if (isNewConversation.value) {
+    isSearching.value = true
     emit('send-message', searchValue.value)
     searchValue.value = ''
     return
@@ -353,7 +354,7 @@ const formatDate = (dateString: string) => {
                               <div class="px-2">{{ formatLawData(item).releaseDate }}公布</div>
                               <div class="px-2">{{ formatLawData(item).implementDate }}施行</div>
                             </div>
-                            <div class="bg-white rounded-md py-2 px-4 text-gray-700 text-xs border border-gray-100">{{ formatLawData(item).content }}</div>
+                            <div class="bg-white rounded-md py-2 px-4 text-gray-700 text-xs border border-gray-100" v-html="formatLawData(item).content"></div>
                           </div>
                         </template>
                       </a-list-item-meta>

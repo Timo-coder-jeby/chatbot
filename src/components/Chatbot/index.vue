@@ -209,9 +209,10 @@ const loadCurrentMessages = async (key: string) => {
   }
 
   try {
-    // const response = await aiService.get(`/chat/session/messages/${key}/${curMenuItem?.value?.type}`)
-    // const response = await aiService.get(`/chat/session/messages/${key}`)
-    const response = serviceData
+    // fixme 如果是ajax请求组件内加载内容
+    if (curMenuItem.value?.apiType == 'ajax') return
+    const response = await aiService.get(`/chat/session/messages/${key}`)
+    // const response = serviceData
 
     if (!response || !Array.isArray(response)) {
       currentMessages.value = []
@@ -365,7 +366,7 @@ const handleSendMessage = async (message: string) => {
 
   try {
     // 使用流式响应，传入 signal
-    await aiService.sendMessageStream(
+    const resp = await aiService.sendMessageStream(
       techMenu.value[curMenuIndex.value].apiBase ?? undefined,
       {
         sessionId: currentConversation.sessionKey ?? '',
@@ -395,9 +396,15 @@ const handleSendMessage = async (message: string) => {
           }
         }
       },
-      // 传入 AbortController 的 signal
-      abortController.signal
+      abortController.signal,
+      (curMenuItem?.value?.apiType as 'stream' | 'ajax') || 'stream'
     )
+    if (resp && curMenuItem.value.apiType == 'ajax') {
+      // 如果是非流式响应，直接将响应内容添加到AI消息中
+      aiMessage.content = resp?.data || '抱歉，没有收到回复，请重试。'
+      currentMessages.value.push(aiMessage)
+      aiMessageAdded = true
+    }
 
     // 如果没有收到任何内容，添加错误消息
     if (!aiMessageAdded) {

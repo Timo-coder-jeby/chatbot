@@ -45,7 +45,8 @@ interface IAIService {
     url?: string,
     data?: StreamParams,
     onChunk?: (chunk: string) => void,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    apiType?: 'stream' | 'ajax'
   ): Promise<AIResponse>
   get: (url: string, params?: any, cof?: any) => Promise<any>
   post: (url: string, data?: any, cof?: any) => Promise<any>
@@ -97,102 +98,25 @@ class AIService implements IAIService {
     }
   }
 
-  // 流式响应
+  // 统一的消息发送方法，根据apiType区分流式和普通请求
   async sendMessageStream(
     url: string = '/post/stream/flux1',
     data: StreamParams,
     onChunk?: (chunk: string) => void,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    apiType: 'stream' | 'ajax' = 'stream'
   ): Promise<AIResponse> {
     try {
-      // const response = await fetch(`${this.config.baseURL}/post/stream/flux1`, {
-      const response = await fetch(`${this.config.baseURL}${url}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.config.apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({...data, role: '云流智能法律机器人'}),
-        signal
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const reader = response.body?.getReader()
-      if (!reader) {
-        throw new Error('无法读取响应流')
-      }
-
-      const decoder = new TextDecoder()
-      let fullContent = ''
-
-      try {
-        while (true) {
-          if (signal?.aborted) {
-            throw new DOMException('The operation was aborted.', 'AbortError')
-          }
-
-          const { done, value } = await reader.read()
-          if (done) break
-
-          const chunk = decoder.decode(value, { stream: true })
-
-          // 按行分割处理
-          const lines = chunk.split('\n')
-
-          for (const line of lines) {
-            if (!line.trim()) continue
-
-            // 移除 data: 前缀
-            let content = line.startsWith('data:') ? line.slice(5) : line
-            if (!content.trim()) continue
-
-            try {
-              // 解析JSON
-              const parsedData = JSON.parse(content)
-
-              // 兼容两种数据格式
-              if (
-                (parsedData.type == 'ai_message' || parsedData.type == 'legal_advice_data')
-                && parsedData.message
-              ) {
-                // 新格式：直接从 message 字段获取文本
-                const text = parsedData.message
-                fullContent += text
-                onChunk?.(text)
-              } else if (parsedData.event_type === 2001 && parsedData.event_data) {
-                // 原格式：复杂的嵌套JSON结构
-                const eventData = JSON.parse(parsedData.event_data)
-
-                if (eventData.is_delta === true && eventData.message?.content) {
-                  const messageContent = JSON.parse(eventData.message.content)
-
-                  if (messageContent.text) {
-                    const text = messageContent.text
-                    fullContent += text
-                    onChunk?.(text)
-                  }
-                }
-              }
-              // 忽略其他类型的事件 (如 start, complete 等)
-
-            } catch (parseError) {
-              // 如果JSON解析失败，跳过这行
-              console.warn('JSON解析失败:', parseError, 'content:', content)
-              continue
-            }
-          }
-        }
-
-        return { data: fullContent }
-      } finally {
-        reader.releaseLock()
+      if (apiType === 'ajax') {
+        // 普通AJAX请求模式
+        return await this.sendAjaxRequest(url, data, signal)
+      } else {
+        // 流式请求模式
+        return await this.sendStreamRequest(url, data, onChunk, signal)
       }
     } catch (error: any) {
-      console.error('流式请求失败:', error)
-      
+      console.error('请求失败:', error)
+
       if (error.name === 'AbortError') {
         throw error
       }
@@ -201,6 +125,137 @@ class AIService implements IAIService {
         data: '抱歉，服务暂时不可用，请稍后重试。',
         error: error.message
       }
+    }
+  }
+
+  // 普通AJAX请求方法
+  private async sendAjaxRequest(
+    url: string,
+    data: StreamParams,
+    signal?: AbortSignal
+  ): Promise<AIResponse> {
+    const response = await fetch(`${this.config.baseURL}${url}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.config.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({...data, role: '云流智能法律机器人'}),
+      signal
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const result = await response.json()
+
+    console.log('🫡',{
+      data: result.data || result,
+      params: data,
+      type: 'ajax'
+    })
+    // 直接返回接口返回的data
+    return {
+      data: result.data || result,
+      params: data,
+      type: 'ajax'
+    }
+  }
+
+  // 流式请求方法
+  private async sendStreamRequest(
+    url: string,
+    data: StreamParams,
+    onChunk?: (chunk: string) => void,
+    signal?: AbortSignal
+  ): Promise<AIResponse> {
+    const response = await fetch(`${this.config.baseURL}${url}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.config.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({...data, role: '云流智能法律机器人'}),
+      signal
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const reader = response.body?.getReader()
+    if (!reader) {
+      throw new Error('无法读取响应流')
+    }
+
+    const decoder = new TextDecoder()
+    let fullContent = ''
+
+    try {
+      while (true) {
+        if (signal?.aborted) {
+          throw new DOMException('The operation was aborted.', 'AbortError')
+        }
+
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value, { stream: true })
+
+        // 按行分割处理
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (!line.trim()) continue
+
+          // 移除 data: 前缀
+          let content = line.startsWith('data:') ? line.slice(5) : line
+          if (!content.trim()) continue
+
+          try {
+            // 解析JSON
+            const parsedData = JSON.parse(content)
+
+            // 兼容两种数据格式
+            if (
+              (parsedData.type == 'ai_message' || parsedData.type == 'legal_advice_data')
+              && parsedData.message
+            ) {
+              // 新格式：直接从 message 字段获取文本
+              const text = parsedData.message
+              fullContent += text
+              onChunk?.(text)
+            } else if (parsedData.event_type === 2001 && parsedData.event_data) {
+              // 原格式：复杂的嵌套JSON结构
+              const eventData = JSON.parse(parsedData.event_data)
+
+              if (eventData.is_delta === true && eventData.message?.content) {
+                const messageContent = JSON.parse(eventData.message.content)
+
+                if (messageContent.text) {
+                  const text = messageContent.text
+                  fullContent += text
+                  onChunk?.(text)
+                }
+              }
+            }
+            // 忽略其他类型的事件 (如 start, complete 等)
+
+          } catch (parseError) {
+            // 如果JSON解析失败，跳过这行
+            console.warn('JSON解析失败:', parseError, 'content:', content)
+            continue
+          }
+        }
+      }
+
+      return {
+        data: fullContent,
+        type: 'stream'
+      }
+    } finally {
+      reader.releaseLock()
     }
   }
 
