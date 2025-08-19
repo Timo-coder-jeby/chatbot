@@ -28,7 +28,7 @@ const emit = defineEmits<{
 }>()
 
 const SORT_OPTIONS = [
-  { label: '相关性', value: 'similarity' },
+  { label: '相关度', value: 'similarity' },
   { label: '发布时间', value: 'releaseDate' },
   { label: '实施时间', value: 'implementDate' }
 ]
@@ -42,19 +42,28 @@ const sortRule = ref('similarity')
 const currentPage = ref(1)
 const pageSize = ref(10)
 
-// 建议词条
+const LAW_TITLE_KEY = [
+  { key: 'potencyLv1'},
+  { key: 'issuingOrganLv1'},
+  { key: 'issuingNo'},
+  { key: 'releaseDate', suffix: '公布' },
+  { key: 'implementDate', suffix: '施行' }
+]
+
+/**
+ * 建议搜索词条
+ */
 const suggestedTerms = computed(() => {
-  if (props.curMenuItem.type === 'law') {
-    return [
-      '劳动合同法',
-      '刑法修正案',
-      '民事诉讼法',
-      '知识产权法',
-      '公司法条例',
-      '婚姻法规定'
-    ]
-  } else {
-    return [
+  return props.curMenuItem.type === 'law' ?
+    [
+    '劳动合同法',
+    '刑法修正案',
+    '民事诉讼法',
+    '知识产权法',
+    '公司法条例',
+    '婚姻法规定'
+    ] :
+    [
       '合同纠纷案例',
       '交通事故赔偿',
       '劳动争议案件',
@@ -62,7 +71,6 @@ const suggestedTerms = computed(() => {
       '知识产权侵权',
       '刑事辩护案例'
     ]
-  }
 })
 
 // 计算是否为新会话
@@ -77,7 +85,7 @@ const currentConversation = computed(() => {
 
 const setCaseList = (response: any) => {
   serviceResult.value = response
-  searchResults.value = response?.lawResult ?? []
+  searchResults.value = response?.lawResult ?? response?.caseResult ?? []
   isSearching.value = false
 }
 
@@ -177,29 +185,47 @@ const handleSuggestedSearch = (term: string) => {
 }
 const stripRN = (str: string) => str.replace(/\\r\\n|\\r|\\n|[\r\n]/g, '')
 
-// 格式化法规数据用于显示
+const curKeyType = computed(() => props?.curMenuItem?.type || 'law')
+
+/**
+ * 格式化法律数据
+ * @param item
+ */
 const formatLawData = (item: any) => {
-  const lawDomain = item.lawDomain || {}
-  const potencyLevels = lawDomain?.potencyLevel ? JSON.parse(lawDomain.potencyLevel) : {}
+  const domain = item.lawDomain || item.caseDomain || {}
+  const potencyLevels = domain?.potencyLevel ? JSON.parse(domain.potencyLevel) : {}
+  const issuingOrgan = (domain.issuingOrgan && JSON.parse(domain.issuingOrgan)) || ''
   return {
-    title: lawDomain.lawName || lawDomain.lawTitle || '未知法规',
-    content: stripRN(lawDomain?.lawSourceContent || ''),
+    domain,
+    title: domain[`${curKeyType.value}Name`] || domain?.[`${curKeyType.value}Title`] || '未知法规',
+    content: stripRN(domain?.[`${curKeyType.value}SourceContent`] || ''),
     similarity: item.similarity || '0',
-    issuingOrgan: (lawDomain.issuingOrgan && JSON.parse(lawDomain.issuingOrgan)) || '',
-    issuingNo: lawDomain.issuingNo || '',
-    releaseDate: lawDomain.releaseYearMonthDate || '',
-    implementDate: lawDomain.implementYearMonthDate || '',
+    issuingOrgan,
+    issuingOrganLv1: issuingOrgan.level1Name || '',
+    issuingNo: domain.issuingNo || '',
+    releaseDate: domain.releaseYearMonthDate || '',
+    implementDate: domain.implementYearMonthDate || '',
     potencyLevels,
-    timeliness: lawDomain.timeliness || '',
-    thematicClassify: lawDomain.thematicClassify || ''
+    potencyLv1: potencyLevels.level1Name || '',
+    timeliness: domain.timeliness || domain?.caseType || '',
+    thematicClassify: domain.thematicClassify || '',
+    courtThink: stripRN(domain.courtThink || ''),
+    verdict: stripRN(domain.verdict || ''),
   }
 }
 
-
+const caseItemTabLabel = computed(() => (tabKey:string) => {
+  const LABELS = {
+    courtThink: '法院观点',
+    verdict: '判决结果'
+    }
+    return LABELS[tabKey as keyof typeof LABELS] || '未知标签'
+  }
+)
 </script>
 
 <template>
-  <div class="flex flex-col flex-1 bg-gray-50 overflow-hidden case-box">
+  <div class="flex flex-col flex-1 overflow-hidden case-box">
     <!-- 头部 -->
     <div class="flex-shrink-0 p-6 bg-white border-b border-gray-200">
       <div class="flex items-center gap-4">
@@ -257,80 +283,98 @@ const formatLawData = (item: any) => {
       <!-- 历史会话：显示搜索结果列表 -->
       <div v-else class="h-full flex flex-col">
         <!-- 搜索结果 -->
-        <div class="h-full flex flex-col">
-          <div class="h-full p-4 w-full">
-            <!-- 加载状态 -->
-            <div v-if="isSearching" class="flex flex-col items-center justify-center h-48">
-              <a-spin size="large" />
-              <p class="mt-4 text-gray-600">正在检索中...</p>
-            </div>
+        <div class="h-full px-4 w-full">
+          <!-- 加载状态 -->
+          <div v-if="isSearching" class="flex flex-col items-center justify-center h-48">
+            <a-spin size="large" />
+            <p class="mt-4 text-gray-600">正在检索中...</p>
+          </div>
 
-            <!-- 结果列表 -->
-            <div v-else-if="!!searchResults?.length" class="h-full flex flex-col">
-              <!-- 结果统计 -->
-              <div class="mb-4 p-3 bg-red-50 rounded-lg border border-red-100">
-                <div class="flex items-center justify-between">
-                  <span class="text-sm text-gray-600">
-                    <ClockCircleOutlined /><span class="font-semibold pl-2">{{ serviceResult?.query }}</span>
-                  </span>
-                  <a-select
-                    v-model:value="sortRule"
-                    class="w-[100px] border-none"
-                    :dropdownMatchSelectWidth="false"
-                  >
-                    <a-select-option
-                      v-for="option in SORT_OPTIONS"
-                      :key="option.value"
-                      :value="option.value"
-                      :title="option.label"
-                    >{{ option.label }}</a-select-option>
-                  </a-select>
-                </div>
-              </div>
-
-              <!-- 结果卡片列表  searchResults -->
-              <div class="flex-1 overflow-y-auto">
-                <a-list
-                  item-layout="vertical" size="large"  :data-source="searchResults"
+          <!-- 结果列表 -->
+          <div v-else-if="!!searchResults?.length" class="h-full flex flex-col">
+            <!-- 结果统计 -->
+            <div class="mb-4 p-3 bg-red-50 rounded-lg border border-red-100">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-600">
+                  <ClockCircleOutlined /><span class="font-semibold pl-2">{{ serviceResult?.query }}</span>
+                </span>
+                <a-select
+                  v-model:value="sortRule"
+                  class="w-[100px] border-none"
+                  :dropdownMatchSelectWidth="false"
                 >
-                  <template #renderItem="{item}">
-                    <a-list-item :key="item?.similarity">
-                      <a-list-item-meta>
-                        <template #title>
-                          <div class="flex items-center justify-between">
-                            <div class="text-blue-600">{{ formatLawData(item).title }}</div>
-                            <a-tag color="processing">{{ formatLawData(item).timeliness }}</a-tag>
-                          </div>
-                        </template>
-                        <template #description>
-                          <div>
-                            <div class="text-xs text-gray-400 divide-x divide-gray-300 flex items-center pb-2">
-                              <div class="px-2">{{ formatLawData(item).potencyLevels?.level1Name }}</div>
-                              <div class="px-2">{{ formatLawData(item).issuingOrgan?.level1Name }}</div>
-                              <div class="px-2">{{ formatLawData(item)?.issuingNo }}</div>
-                              <div class="px-2">{{ formatLawData(item).releaseDate }}公布</div>
-                              <div class="px-2">{{ formatLawData(item).implementDate }}施行</div>
-                            </div>
-                            <div
-                              class="bg-white rounded-md py-2 px-4 text-gray-700 text-xs border border-gray-100"
-                              >
-                              <div class="m-0 p-0 line-clamp-[8]">{{ formatLawData(item).content }}</div>
-                            </div>
-                          </div>
-                        </template>
-                      </a-list-item-meta>
-                    </a-list-item>
-                  </template>
-                </a-list>
+                  <a-select-option
+                    v-for="option in SORT_OPTIONS"
+                    :key="option.value"
+                    :value="option.value"
+                    :title="option.label"
+                  >{{ option.label }}</a-select-option>
+                </a-select>
               </div>
             </div>
 
-            <!-- 空状态 -->
-            <div v-else class="h-64">
-              <a-empty
-                :description="`暂无${curMenuItem.type === 'law' ? '法条' : '案例'}检索结果`"
-              />
+            <!-- 结果卡片列表  searchResults -->
+            <div class="flex-1 overflow-y-auto">
+              <a-list
+                item-layout="vertical" size="large"  :data-source="searchResults"
+              >
+                <template #renderItem="{item}">
+                  <a-list-item :key="item?.similarity">
+                    <a-list-item-meta>
+                      <template #title>
+                        <div class="flex items-center justify-between gap-2">
+                          <div class="text-blue-600 line-clamp-1 cursor-pointer">{{ formatLawData(item).title }}</div>
+                          <a-tag color="processing">{{ formatLawData(item).timeliness }}</a-tag>
+                        </div>
+                      </template>
+                      <template #description>
+                        <div>
+                          <!-- 标题头部信息 -->
+                          <div class="text-xs text-gray-400 divide-x divide-gray-300 flex items-center pb-2">
+                            <template v-if="curKeyType == 'law'">
+                              <template v-for="law in LAW_TITLE_KEY" :key="law.key">
+                                <div v-if="!!(formatLawData(item) as any)[law.key]" class="px-2">{{ (formatLawData(item) as any)[law.key] }}{{law.suffix ? ` ${law.suffix}` : ''}}</div>
+                              </template>
+                            </template>
+                            <template v-if="curKeyType == 'case'">
+                              <template v-for="c in ['caseCause','caseNo','trialDate','trialLevel']" :key="c">
+                                <div class="px-2" v-if="!!formatLawData(item).domain?.[c]">{{ formatLawData(item).domain?.[c] }}</div>
+                              </template>
+                            </template>
+                          </div>
+
+                          <!-- 内容信息 -->
+                          <div class="bg-gray-100 rounded-md py-2 px-4 text-gray-700 text-xs">
+                            <div v-if="curKeyType == 'law'" class="m-0 p-0 line-clamp-[8]">{{ formatLawData(item).content }}</div>
+                            <div class="m-0 p-0" v-if="curKeyType == 'case'">
+                              <div class="text-xs text-gray-400 divide-x divide-gray-300 flex items-center p-2">
+                                <div
+                                  v-for="(key,n) in ['courtThink','verdict']"
+                                  :key="key"
+                                  @click="() => {
+                                    item.caseTabKey = key
+                                    console.log('当前',item);
+                                  }"
+                                  :class="['cursor-pointer','px-2',{'text-blue-600': item.caseTabKey ? item.caseTabKey == key : n == 0}]"
+                                >{{ caseItemTabLabel(key) }}</div>
+                              </div>
+                              <div class="line-clamp-[8]">{{ (formatLawData(item) as any)?.[item?.caseTabKey || 'courtThink'] }}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </template>
+                    </a-list-item-meta>
+                  </a-list-item>
+                </template>
+              </a-list>
             </div>
+          </div>
+
+          <!-- 空状态 -->
+          <div v-else class="pt-[20vh] text-gray-400">
+            <a-empty
+              :description="`暂无${curMenuItem.type === 'law' ? '法条' : '案例'}检索结果`"
+            />
           </div>
         </div>
       </div>
@@ -350,6 +394,9 @@ const formatLawData = (item: any) => {
   }
   &:deep(.ant-select-focused .ant-select-selector) {
     box-shadow: none !important;
+  }
+  &:deep(.ant-list-item){
+    padding: 16px 4px;
   }
 }
 </style>
