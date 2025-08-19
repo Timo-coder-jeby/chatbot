@@ -60,7 +60,6 @@ import ChatContent from "./ChatContent.vue";
 import Case from "./Case.vue";
 
 const aiService = inject<IAIService>('aiService')!
-import serviceData from './data.json'
 
 // 响应式数据
 const activeConversationKey = ref('conv-1')
@@ -212,7 +211,6 @@ const loadCurrentMessages = async (key: string) => {
     // fixme 如果是ajax请求组件内加载内容
     if (curMenuItem.value?.apiType == 'ajax') return
     const response = await aiService.get(`/chat/session/messages/${key}`)
-    // const response = serviceData
 
     if (!response || !Array.isArray(response)) {
       currentMessages.value = []
@@ -312,7 +310,12 @@ const deleteConversation = async (key: string) => {
 // 用于控制流式响应的 AbortController
 let abortController: AbortController | null = null
 
-const handleSendMessage = async (message: string) => {
+/**
+ * todo 所有新建的会话都走该方法
+ * @param message
+ * @param callback
+ */
+const handleSendMessage = async (message: string,callback?: (resp:any) => {}) => {
   if (!message.trim() || isTyping.value) return
 
   // 立即清空输入框
@@ -400,10 +403,10 @@ const handleSendMessage = async (message: string) => {
       (curMenuItem?.value?.apiType as 'stream' | 'ajax') || 'stream'
     )
     if (resp && curMenuItem.value.apiType == 'ajax') {
-      // 如果是非流式响应，直接将响应内容添加到AI消息中
-      aiMessage.content = resp?.data || '抱歉，没有收到回复，请重试。'
-      currentMessages.value.push(aiMessage)
-      aiMessageAdded = true
+      if (conversationList[0]?.key?.startsWith('conv-') && resp.params.sessionId == currentConversation.sessionKey) {
+        conversationList[0].key = resp.params.sessionId
+        activeConversationKey.value = resp.params.sessionId
+      }
     }
 
     // 如果没有收到任何内容，添加错误消息

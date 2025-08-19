@@ -48,16 +48,6 @@ const handleMenuChange = (index: number) => {
   emit('menu-change', index)
 }
 
-// 获取菜单描述
-const getMenuDescription = (type: string) => {
-  const descriptions = {
-    'consult': '智能法律问答服务',
-    'law': '法条条文精准检索',
-    'case': '判例案例深度查询'
-  }
-  return descriptions[type] || '功能服务'
-}
-
 // 格式化时间
 const formatTime = (timestamp: number) => {
   const now = Date.now()

@@ -110,17 +110,14 @@ class AIService implements IAIService {
       if (apiType === 'ajax') {
         // 普通AJAX请求模式
         return await this.sendAjaxRequest(url, data, signal)
-      } else {
-        // 流式请求模式
-        return await this.sendStreamRequest(url, data, onChunk, signal)
       }
+      // 默认流式请求模式
+      return await this.sendStreamRequest(url, data, onChunk, signal)
     } catch (error: any) {
-      console.error('请求失败:', error)
-
+      console.error('新建会话失败:', error)
       if (error.name === 'AbortError') {
         throw error
       }
-
       return {
         data: '抱歉，服务暂时不可用，请稍后重试。',
         error: error.message
@@ -150,14 +147,9 @@ class AIService implements IAIService {
 
     const result = await response.json()
 
-    console.log('🫡',{
-      data: result.data || result,
-      params: data,
-      type: 'ajax'
-    })
     // 直接返回接口返回的data
     return {
-      data: result.data || result,
+      data: result,
       params: data,
       type: 'ajax'
     }

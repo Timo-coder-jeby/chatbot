@@ -5,7 +5,6 @@ import { message } from 'ant-design-vue'
 import { type IAIService } from '@/services/aiService.ts'
 
 const aiService = inject<IAIService>('aiService')!
-import serviceData from './data.json'
 
 // Props定义
 type Props = {
@@ -25,7 +24,7 @@ const props = defineProps<Props>()
 
 // Emits定义
 const emit = defineEmits<{
-  'send-message': [message: string]
+  'send-message': [message: string, callback?: (response: any) => void]
 }>()
 
 const SORT_OPTIONS = [
@@ -76,6 +75,12 @@ const currentConversation = computed(() => {
   return props.conversationList.find(item => item.key === props.activeConversationKey)
 })
 
+const setCaseList = (response: any) => {
+  serviceResult.value = response
+  searchResults.value = response?.lawResult ?? []
+  isSearching.value = false
+}
+
 // 加载历史会话的搜索结果
 const loadHistoryResults = async () => {
   if (!currentConversation.value?.sessionKey) return
@@ -84,45 +89,7 @@ const loadHistoryResults = async () => {
   try {
     // 获取历史会话消息
     const response = await aiService.get(`/chat/session/messages/${currentConversation.value.sessionKey}`)
-
-    // const response = serviceData.data
-    serviceResult.value = response
-    console.log('🥶',response);
-    // 处理您提供的法规搜索数据结构
-    if (response?.lawResult && Array.isArray(response.lawResult)) {
-      // 直接使用 lawResult 数组
-      searchResults.value = response.lawResult
-    } else if (Array.isArray(response)) {
-      // 从消息数组中查找包含法规数据的消息
-      const searchMessages = response.filter(msg =>
-        msg.type === 'AI' && msg.text && (
-          msg.text.includes('lawResult') ||
-          msg.text.includes('lawDomain') ||
-          msg.text.includes('currentPage') ||
-          msg.text.includes('totalCount')
-        )
-      )
-
-      if (searchMessages.length > 0) {
-        // 尝试从最新的搜索消息中解析数据
-        const latestSearchMsg = searchMessages[searchMessages.length - 1]
-        try {
-          const parsed = JSON.parse(latestSearchMsg.text)
-          if (parsed.lawResult && Array.isArray(parsed.lawResult)) {
-            searchResults.value = parsed.lawResult
-          } else {
-            searchResults.value = []
-          }
-        } catch (parseError) {
-          console.warn('解析历史搜索结果失败:', parseError)
-          searchResults.value = []
-        }
-      } else {
-        searchResults.value = []
-      }
-    } else {
-      searchResults.value = []
-    }
+    setCaseList(response)
   } catch (error) {
     console.error('加载历史搜索结果失败:', error)
     searchResults.value = []
@@ -138,7 +105,7 @@ watch(() => props.activeConversationKey, async () => {
   } else {
     searchResults.value = []
   }
-}, { immediate: true })
+},{ immediate: false})
 
 // 执行搜索
 const handleSearch = async () => {
@@ -147,7 +114,15 @@ const handleSearch = async () => {
   // 如果是新会话，使用 handleSendMessage 获取 sessionId
   if (isNewConversation.value) {
     isSearching.value = true
-    emit('send-message', searchValue.value)
+    emit('send-message', searchValue.value, async (response) => {
+      console.log(response);
+      if (response?.data?.sessionId) {
+        currentConversation.value.sessionKey = response?.data?.sessionId
+        setCaseList(response?.data?.data)
+      } else {
+        message.error('获取会话 ID 失败，请稍后重试')
+      }
+    })
     searchValue.value = ''
     return
   }
@@ -220,26 +195,7 @@ const formatLawData = (item: any) => {
   }
 }
 
-// 获取时效性颜色
-const getTimelinessColor = (timeliness: string) => {
-  const colorMap: Record<string, string> = {
-    '现行有效': 'green',
-    '已废止': 'red',
-    '已失效': 'orange',
-    '已修改': 'blue'
-  }
-  return colorMap[timeliness] || 'default'
-}
 
-// 格式化日期
-const formatDate = (dateString: string) => {
-  if (!dateString) return ''
-  try {
-    return new Date(dateString).toLocaleDateString('zh-CN')
-  } catch {
-    return dateString
-  }
-}
 </script>
 
 <template>
@@ -371,11 +327,9 @@ const formatDate = (dateString: string) => {
 
             <!-- 空状态 -->
             <div v-else class="h-64">
-              <a-empty :description="`暂无${curMenuItem.type === 'law' ? '法条' : '案例'}检索结果`">
-                <a-button type="primary" @click="searchValue = ''">
-                  开始搜索
-                </a-button>
-              </a-empty>
+              <a-empty
+                :description="`暂无${curMenuItem.type === 'law' ? '法条' : '案例'}检索结果`"
+              />
             </div>
           </div>
         </div>
