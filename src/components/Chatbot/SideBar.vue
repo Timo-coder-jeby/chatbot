@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h } from 'vue'
+import logo from '@/assets/icons/logo.png'
 import { type ConversationItem } from '@/services/aiService.ts'
 
 import {
@@ -72,11 +72,17 @@ const handleMenuClick = (e: any, conversationKey: string) => {
 </script>
 
 <template>
-  <div class="col-start-1 row-start-1 bg-white/90 backdrop-blur-xl flex flex-col relative z-10 rounded-3xl shadow-2xl border border-red-100/30 overflow-hidden">
+  <div class="bg-white/90 backdrop-blur-xl flex flex-col relative z-10 rounded-3xl shadow-2xl border border-red-100/30 overflow-hidden">
     <!-- 顶部品牌区域 -->
-    <div class="flex items-center px-6 py-5 border-b border-red-100/50 bg-gradient-to-r from-red-50/50 to-rose-50/30">
-      <div class="flex items-center text-xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
-        CLOUDATA LEGAL SYS AI
+    <div class="flex items-center justify-center gap-2 px-6 py-5 border-b border-red-100/50 bg-gradient-to-br from-orange-50 via-red-50 to-pink-100">
+      <a-avatar
+        icon="云流"
+        size="large"
+        alt="云流智法 Logo"
+        :src="logo"
+      />
+      <div class="flex items-center text-xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+        云流智法
       </div>
     </div>
 
@@ -136,15 +142,15 @@ const handleMenuClick = (e: any, conversationKey: string) => {
         </a-button>
       </div>
 
-      <div class="space-y-2">
+      <div class="space-y-4">
         <div
           v-for="conversation in conversationList"
           :key="conversation.key"
           :class="[
-            'group relative flex items-center overflow-hidden justify-between p-4 rounded-2xl cursor-pointer transition-all duration-300 border',
-            'hover:bg-red-50 hover:border-red-200 hover:shadow-md hover:-translate-y-0.5',
+            'relative flex items-center overflow-hidden justify-between p-4 rounded-2xl cursor-pointer transition-all duration-300 shadow-md',
+            'hover:bg-red-50 hover:border-red-200 hover:shadow-lg hover: text-orange-600 hover:scale-105',
             conversation.key === activeConversationKey
-              ? 'bg-gradient-to-r from-red-50 to-rose-50 border-red-200 shadow-md'
+              ? 'bg-gradient-to-r from-red-50 to-rose-50 border-0 shadow-lg scale-105'
               : 'bg-white/60 border-red-100'
           ]"
           @click="handleConversationChange(conversation.key)"
@@ -153,7 +159,7 @@ const handleMenuClick = (e: any, conversationKey: string) => {
           <div
             :class="[
               'absolute left-0 top-0 bottom-0 w-1 rounded-r-md transition-transform duration-300',
-              'bg-gradient-to-b from-red-500 to-red-600',
+              'bg-gradient-to-b from-orange-300 to-orange-500',
               conversation.key === activeConversationKey ? 'scale-y-100' : 'scale-y-0'
             ]"
           ></div>
@@ -163,13 +169,13 @@ const handleMenuClick = (e: any, conversationKey: string) => {
               :class="[
                 'text-sm font-medium mb-1 line-clamp-1 leading-5',
                 conversation.key === activeConversationKey
-                  ? 'text-slate-700 font-semibold'
+                  ? 'text-orange-600 font-semibold'
                   : 'text-slate-600'
               ]"
             >
               {{ conversation.label }}
             </div>
-            <div class="text-xs text-slate-400 font-normal">
+            <div class="text-xs text-orange-300 font-normal">
               {{ formatTime(conversation.timestamp) }}
             </div>
           </div>
@@ -204,7 +210,7 @@ const handleMenuClick = (e: any, conversationKey: string) => {
     </div>
 
     <!-- 底部用户信息 -->
-    <div class="px-5 py-4 border-t border-red-100/50 bg-gradient-to-r from-red-50/50 to-rose-50/30">
+    <div class="px-5 py-4 border-t border-red-100/50 bg-gradient-to-br from-orange-50 via-red-50 to-pink-100">
       <div class="flex items-center">
         <div class="text-xl text-red-600 mr-3 bg-red-100 rounded-xl p-2">
           <UserOutlined />
