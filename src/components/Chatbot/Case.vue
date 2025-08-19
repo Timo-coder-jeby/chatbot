@@ -71,7 +71,6 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 
 const openIframe = (id: string, title: string) => {
-  'https://tongyi.aliyun.com/farui/caseDetail/86ae7501d20167f2fc6e86405439e626'
   iframeUrl.value = `https://tongyi.aliyun.com/farui/${curKeyType.value}Detail/${id}`
   iframeTitle.value = title
   iframeVisible.value = true
@@ -123,8 +122,14 @@ const loadHistoryResults = async () => {
   isSearching.value = true
   try {
     // 获取历史会话消息
-    const response = await aiService.get(`/chat/session/messages/${currentConversation.value.sessionKey}`)
-    setCaseList(response)
+    const response = await aiService.post(
+      `/chat/session/messages`,
+      {
+        sessionId: currentConversation.value.sessionKey,
+        sortKeyAndDirection: { [sortRule.value]: 'desc' },
+      }
+    )
+    setCaseList(response?.data)
   } catch (error) {
     console.error('加载历史搜索结果失败:', error)
     searchResults.value = []
@@ -133,9 +138,17 @@ const loadHistoryResults = async () => {
   }
 }
 
+const resetDefaultValue = () => {
+  searchValue.value = ''
+  searchResults.value = []
+  isSearching.value = false
+  sortRule.value = 'similarity'
+}
+
 // 监听会话变化，如果是历史会话则加载搜索结果
 watch(() => props.activeConversationKey, async () => {
   if (!isNewConversation.value && currentConversation.value?.sessionKey) {
+    resetDefaultValue()
     await loadHistoryResults()
   } else {
     searchResults.value = []
@@ -273,16 +286,7 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
     <div class="flex-1 overflow-y-auto">
       <!-- 新会话：显示搜索框 -->
       <div v-if="isNewConversation" class="flex items-center justify-center h-full p-8">
-        <div class="w-full max-w-2xl text-center">
-          <a-avatar :size="80" class="bg-red-500 mb-6">
-            <template #icon>
-              <component :is="curMenuItem.type === 'law' ? SearchOutlined : FileSearchOutlined" class="text-3xl" />
-            </template>
-          </a-avatar>
-
-          <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ curMenuItem.title }}</h3>
-          <p class="text-gray-600 mb-6">输入关键词开始智能检索</p>
-
+        <div class="w-full max-w-2xl text-center pt-[15vh]">
           <a-input-search
             v-model:value="searchValue"
             :placeholder="`请输入要搜索的${curMenuItem.type === 'law' ? '法律条文' : '案例'}关键词`"
@@ -299,7 +303,7 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
               v-for="(term, index) in suggestedTerms"
               :key="index"
               @click="handleSuggestedSearch(term)"
-              class="p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:border-red-300 hover:shadow-md transition-all duration-200 cursor-pointer group"
+              class="p-4 bg-gradient-to-r from-red-50 via-orange-50 to-pink-50 shadow-md rounded-md transition-all duration-200 cursor-pointer group hover:border-red-300 hover:scale-105"
             >
               <h4 class="font-medium text-gray-800 mb-1 group-hover:text-red-600 transition-colors">{{ term }}</h4>
               <p class="text-sm text-gray-600">点击搜索</p>
@@ -321,25 +325,28 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
           <!-- 结果列表 -->
           <div v-else-if="!!searchResults?.length" class="h-full flex flex-col">
             <!-- 结果统计 -->
-            <div class="mb-4 p-3 bg-red-50 rounded-lg border border-red-100">
+            <div class="mb-4 p-3 bg-gradient-to-r from-red-50 via-orange-50 to-pink-50 rounded-lg border-0 shadow-sm">
               <div class="flex items-center justify-between">
                 <div>
                   <div class="text-sm text-gray-600">
                     <ClockCircleOutlined /><span class="font-semibold pl-2">{{ serviceResult?.query }}</span>
                   </div>
+                  <!--
                   <div v-if="curKeyType == 'case'" class="divide-x divide-gray-300 flex items-center text-xs text-gray-500 pt-4">
                     <div
-                      :class="['px-2','cursor-pointer','font-bold',{'text-blue-600': curFilterKey == tab.key}]"
+                      :class="['px-2','cursor-pointer','font-bold',{'text-red-600': curFilterKey == tab.key}]"
                       v-for="tab in CASE_FILTER"
                       :key="tab.key"
                       @click="curFilterKey = tab.key"
                     >{{ tab.label }}</div>
                   </div>
+                  -->
                 </div>
                 <a-select
                   v-model:value="sortRule"
                   class="w-[100px] border-none"
                   :dropdownMatchSelectWidth="false"
+                  @change="loadHistoryResults"
                 >
                   <a-select-option
                     v-for="option in (SORT_OPTIONS as any)[curKeyType]"
@@ -362,10 +369,10 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
                       <template #title>
                         <div class="flex items-center justify-between gap-2">
                           <div
-                            class="text-blue-600 line-clamp-1 cursor-pointer font-bold"
+                            class="text-red-600 line-clamp-1 cursor-pointer font-bold"
                             @click="openIframe(formatLawData(item).id,formatLawData(item).title)"
                           >{{ formatLawData(item).title }}</div>
-                          <a-tag color="processing">{{ formatLawData(item).timeliness }}</a-tag>
+                          <a-tag color="error">{{ formatLawData(item).timeliness }}</a-tag>
                         </div>
                       </template>
                       <template #description>
@@ -385,7 +392,7 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
                           </div>
 
                           <!-- 内容信息 -->
-                          <div class="bg-gray-100 rounded-md py-2 px-4 text-gray-700 text-xs">
+                          <div class="bg-gray-50 rounded-md py-2 px-4 text-gray-700 text-xs">
                             <div v-if="curKeyType == 'law'" class="m-0 p-0 line-clamp-[8]">{{ formatLawData(item).content }}</div>
                             <div class="m-0 p-0" v-if="curKeyType == 'case'">
                               <div class="text-xs text-gray-400 divide-x divide-gray-300 flex items-center p-2">
@@ -396,7 +403,7 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
                                     item.caseTabKey = key
                                     console.log('当前',item);
                                   }"
-                                  :class="['cursor-pointer','px-2',{'text-blue-600': item.caseTabKey ? item.caseTabKey == key : n == 0}]"
+                                  :class="['cursor-pointer','px-2',{'text-red-600': item.caseTabKey ? item.caseTabKey == key : n == 0}]"
                                 >{{ caseItemTabLabel(key) }}</div>
                               </div>
                               <div class="line-clamp-[8]">{{ (formatLawData(item) as any)?.[item?.caseTabKey || 'courtThink'] }}</div>

@@ -210,7 +210,7 @@ const loadCurrentMessages = async (key: string) => {
   try {
     // fixme 如果是ajax请求组件内加载内容
     if (curMenuItem.value?.apiType == 'ajax') return
-    const response = await aiService.get(`/chat/session/messages/${key}`)
+    const response = await aiService.post(`/chat/session/messages`,{sessionId: key})
 
     if (!response || !Array.isArray(response)) {
       currentMessages.value = []
