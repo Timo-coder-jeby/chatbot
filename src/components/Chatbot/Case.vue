@@ -29,25 +29,17 @@ const emit = defineEmits<{
   'send-message': [message: string, callback?: (response: any) => void]
 }>()
 
-const SORT_OPTIONS = [
-  { label: '相关度', value: 'similarity' },
-  { label: '发布时间', value: 'releaseDate' },
-  { label: '实施时间', value: 'implementDate' }
-]
-
-// 搜索相关状态
-const searchValue = ref('')
-const searchResults = ref<any[]>([])
-const isSearching = ref(false)
-const serviceResult:any = ref(null)
-const sortRule = ref('similarity')
-
-const iframeVisible = ref<boolean>(false)
-const iframeUrl = ref<string>('')
-const iframeTitle = ref<string>('')
-
-const currentPage = ref(1)
-const pageSize = ref(10)
+const SORT_OPTIONS = {
+  law: [
+    { label: '相关度', value: 'similarity' },
+    { label: '发布时间', value: 'releaseDate' },
+    { label: '实施时间', value: 'implementDate' }
+  ],
+  case: [
+    { label: '相关度', value: 'similarity' },
+    { label: '裁判日期', value: 'trialDate' },
+  ]
+}
 
 const LAW_TITLE_KEY = [
   { key: 'potencyLv1'},
@@ -56,6 +48,27 @@ const LAW_TITLE_KEY = [
   { key: 'releaseDate', suffix: '公布' },
   { key: 'implementDate', suffix: '施行' }
 ]
+
+const CASE_FILTER = [
+  { key: '其他', label: '普通案例' },
+  { key: '参考', label: '公报案例' },
+  { key: '指导性', label: '指导性案例' },
+]
+
+// 搜索相关状态
+const searchValue = ref('')
+const searchResults = ref<any[]>([])
+const isSearching = ref(false)
+const serviceResult:any = ref(null)
+const sortRule = ref('similarity')
+const curFilterKey = ref<string>('其他')
+
+const iframeVisible = ref<boolean>(false)
+const iframeUrl = ref<string>('')
+const iframeTitle = ref<string>('')
+
+const currentPage = ref(1)
+const pageSize = ref(10)
 
 const openIframe = (id: string, title: string) => {
   'https://tongyi.aliyun.com/farui/caseDetail/86ae7501d20167f2fc6e86405439e626'
@@ -300,9 +313,9 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
         <!-- 搜索结果 -->
         <div class="h-full px-4 w-full">
           <!-- 加载状态 -->
-          <div v-if="isSearching" class="flex flex-col items-center justify-center h-48">
+          <div v-if="isSearching" class="flex flex-col items-center justify-center pt-[20vh]">
             <a-spin size="large" />
-            <p class="mt-4 text-gray-600">正在检索中...</p>
+            <p class="mt-4 text-gray-400 text-sm">检索中...</p>
           </div>
 
           <!-- 结果列表 -->
@@ -310,16 +323,26 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
             <!-- 结果统计 -->
             <div class="mb-4 p-3 bg-red-50 rounded-lg border border-red-100">
               <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-600">
-                  <ClockCircleOutlined /><span class="font-semibold pl-2">{{ serviceResult?.query }}</span>
-                </span>
+                <div>
+                  <div class="text-sm text-gray-600">
+                    <ClockCircleOutlined /><span class="font-semibold pl-2">{{ serviceResult?.query }}</span>
+                  </div>
+                  <div v-if="curKeyType == 'case'" class="divide-x divide-gray-300 flex items-center text-xs text-gray-500 pt-4">
+                    <div
+                      :class="['px-2','cursor-pointer','font-bold',{'text-blue-600': curFilterKey == tab.key}]"
+                      v-for="tab in CASE_FILTER"
+                      :key="tab.key"
+                      @click="curFilterKey = tab.key"
+                    >{{ tab.label }}</div>
+                  </div>
+                </div>
                 <a-select
                   v-model:value="sortRule"
                   class="w-[100px] border-none"
                   :dropdownMatchSelectWidth="false"
                 >
                   <a-select-option
-                    v-for="option in SORT_OPTIONS"
+                    v-for="option in (SORT_OPTIONS as any)[curKeyType]"
                     :key="option.value"
                     :value="option.value"
                     :title="option.label"
@@ -339,7 +362,7 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
                       <template #title>
                         <div class="flex items-center justify-between gap-2">
                           <div
-                            class="text-blue-600 line-clamp-1 cursor-pointer"
+                            class="text-blue-600 line-clamp-1 cursor-pointer font-bold"
                             @click="openIframe(formatLawData(item).id,formatLawData(item).title)"
                           >{{ formatLawData(item).title }}</div>
                           <a-tag color="processing">{{ formatLawData(item).timeliness }}</a-tag>
