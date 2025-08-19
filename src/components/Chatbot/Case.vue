@@ -266,164 +266,148 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
 </script>
 
 <template>
-  <div class="flex flex-col flex-1 overflow-hidden case-box">
-    <!-- 头部 -->
-    <div class="flex-shrink-0 p-6 bg-white border-b border-gray-200">
-      <div class="flex items-center gap-4">
-        <a-avatar :size="40" class="bg-red-500">
-          <template #icon>
-            <component :is="curMenuItem.type === 'law' ? SearchOutlined : FileSearchOutlined" />
-          </template>
-        </a-avatar>
-        <div>
-          <h2 class="text-xl font-semibold text-gray-800 m-0">{{ curMenuItem.title }}</h2>
-          <p class="text-sm text-gray-500 m-0">智能检索系统</p>
+  <!-- 主内容区域 -->
+  <div class="flex-1 overflow-hidden case-box">
+    <!-- 新会话：显示搜索框 -->
+    <div v-if="isNewConversation" class="flex items-center justify-center h-full p-8">
+      <div class="w-full max-w-2xl text-center pt-[15vh]">
+        <a-input-search
+          v-model:value="searchValue"
+          :placeholder="`请输入要搜索的${curMenuItem.type === 'law' ? '法律条文' : '案例'}关键词`"
+          size="large"
+          enter-button="开始搜索"
+          :loading="isSearching"
+          @search="handleSearch"
+          allow-clear
+        />
+
+        <!-- 建议词条 -->
+        <div class="grid grid-cols-3 gap-4 mt-8">
+          <div
+            v-for="(term, index) in suggestedTerms"
+            :key="index"
+            @click="handleSuggestedSearch(term)"
+            class="p-4 bg-gradient-to-r from-red-50 via-orange-50 to-pink-50 shadow-md rounded-md transition-all duration-200 cursor-pointer group hover:border-red-300 hover:scale-105"
+          >
+            <h4 class="font-medium text-gray-800 mb-1 group-hover:text-red-600 transition-colors">{{ term }}</h4>
+            <p class="text-sm text-gray-600">点击搜索</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 主内容区域 -->
-    <div class="flex-1 overflow-y-auto">
-      <!-- 新会话：显示搜索框 -->
-      <div v-if="isNewConversation" class="flex items-center justify-center h-full p-8">
-        <div class="w-full max-w-2xl text-center pt-[15vh]">
-          <a-input-search
-            v-model:value="searchValue"
-            :placeholder="`请输入要搜索的${curMenuItem.type === 'law' ? '法律条文' : '案例'}关键词`"
-            size="large"
-            enter-button="开始搜索"
-            :loading="isSearching"
-            @search="handleSearch"
-            allow-clear
-          />
+    <!-- 历史会话：显示搜索结果列表 -->
+    <div v-else class="h-full flex flex-col">
+      <!-- 搜索结果 -->
+      <div class="h-full w-full">
+        <!-- 加载状态 -->
+        <div v-if="isSearching" class="flex flex-col items-center justify-center pt-[20vh]">
+          <a-spin size="large" />
+          <p class="mt-4 text-gray-400 text-sm">检索中...</p>
+        </div>
 
-          <!-- 建议词条 -->
-          <div class="grid grid-cols-3 gap-4 mt-8">
-            <div
-              v-for="(term, index) in suggestedTerms"
-              :key="index"
-              @click="handleSuggestedSearch(term)"
-              class="p-4 bg-gradient-to-r from-red-50 via-orange-50 to-pink-50 shadow-md rounded-md transition-all duration-200 cursor-pointer group hover:border-red-300 hover:scale-105"
-            >
-              <h4 class="font-medium text-gray-800 mb-1 group-hover:text-red-600 transition-colors">{{ term }}</h4>
-              <p class="text-sm text-gray-600">点击搜索</p>
+        <!-- 结果列表 -->
+        <div v-else-if="!!searchResults?.length" class="h-full flex flex-col">
+          <!-- 结果统计 -->
+          <div class="mb-4 p-4 bg-gradient-to-r from-red-50 via-orange-50 to-pink-50 shadow-sm border-b-c">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="title pb-4 text-red-400">{{ props.curMenuItem.title }}</div>
+                <div class="text-sm text-gray-500">
+                  <ClockCircleOutlined /><span class="pl-2 italic">{{ serviceResult?.query }}</span>
+                </div>
+                <!--
+                <div v-if="curKeyType == 'case'" class="divide-x divide-gray-300 flex items-center text-xs text-gray-500 pt-4">
+                  <div
+                    :class="['px-2','cursor-pointer','font-bold',{'text-red-600': curFilterKey == tab.key}]"
+                    v-for="tab in CASE_FILTER"
+                    :key="tab.key"
+                    @click="curFilterKey = tab.key"
+                  >{{ tab.label }}</div>
+                </div>
+                -->
+              </div>
+              <a-select
+                v-model:value="sortRule"
+                class="w-[100px] border-none"
+                :dropdownMatchSelectWidth="false"
+                @change="loadHistoryResults"
+              >
+                <a-select-option
+                  v-for="option in (SORT_OPTIONS as any)[curKeyType]"
+                  :key="option.value"
+                  :value="option.value"
+                  :title="option.label"
+                >{{ option.label }}</a-select-option>
+              </a-select>
             </div>
+          </div>
+
+          <!-- 结果卡片列表  searchResults -->
+          <div class="flex-1 overflow-y-auto px-4">
+            <a-list
+              item-layout="vertical" size="large"  :data-source="searchResults"
+            >
+              <template #renderItem="{item}">
+                <a-list-item :key="item?.similarity">
+                  <a-list-item-meta>
+                    <template #title>
+                      <div class="flex items-center justify-between gap-2">
+                        <div
+                          class="text-red-600 line-clamp-1 cursor-pointer font-bold"
+                          @click="openIframe(formatLawData(item).id,formatLawData(item).title)"
+                        >{{ formatLawData(item).title }}</div>
+                        <a-tag color="error">{{ formatLawData(item).timeliness }}</a-tag>
+                      </div>
+                    </template>
+                    <template #description>
+                      <div>
+                        <!-- 标题头部信息 -->
+                        <div class="text-xs text-gray-400 divide-x divide-gray-300 flex items-center pb-2">
+                          <template v-if="curKeyType == 'law'">
+                            <template v-for="law in LAW_TITLE_KEY" :key="law.key">
+                              <div v-if="!!(formatLawData(item) as any)[law.key]" class="px-2">{{ (formatLawData(item) as any)[law.key] }}{{law.suffix ? ` ${law.suffix}` : ''}}</div>
+                            </template>
+                          </template>
+                          <template v-if="curKeyType == 'case'">
+                            <template v-for="c in ['caseCause','caseNo','trialDate','trialLevel']" :key="c">
+                              <div class="px-2" v-if="!!formatLawData(item).domain?.[c]">{{ formatLawData(item).domain?.[c] }}</div>
+                            </template>
+                          </template>
+                        </div>
+
+                        <!-- 内容信息 -->
+                        <div class="bg-gray-50 rounded-md py-2 px-4 text-gray-700 text-xs">
+                          <div v-if="curKeyType == 'law'" class="m-0 p-0 line-clamp-[8] leading-relaxed">{{ formatLawData(item).content }}</div>
+                          <div class="m-0 p-0" v-if="curKeyType == 'case'">
+                            <div class="text-xs text-gray-400 divide-x divide-gray-300 flex items-center p-2">
+                              <div
+                                v-for="(key,n) in ['courtThink','verdict']"
+                                :key="key"
+                                @click="() => {
+                                  item.caseTabKey = key
+                                  console.log('当前',item);
+                                }"
+                                :class="['cursor-pointer','px-2',{'text-red-600': item.caseTabKey ? item.caseTabKey == key : n == 0}]"
+                              >{{ caseItemTabLabel(key) }}</div>
+                            </div>
+                            <div class="line-clamp-[8] leading-relaxed">{{ (formatLawData(item) as any)?.[item?.caseTabKey || 'courtThink'] }}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                  </a-list-item-meta>
+                </a-list-item>
+              </template>
+            </a-list>
           </div>
         </div>
-      </div>
 
-      <!-- 历史会话：显示搜索结果列表 -->
-      <div v-else class="h-full flex flex-col">
-        <!-- 搜索结果 -->
-        <div class="h-full px-4 w-full">
-          <!-- 加载状态 -->
-          <div v-if="isSearching" class="flex flex-col items-center justify-center pt-[20vh]">
-            <a-spin size="large" />
-            <p class="mt-4 text-gray-400 text-sm">检索中...</p>
-          </div>
-
-          <!-- 结果列表 -->
-          <div v-else-if="!!searchResults?.length" class="h-full flex flex-col">
-            <!-- 结果统计 -->
-            <div class="mb-4 p-3 bg-gradient-to-r from-red-50 via-orange-50 to-pink-50 rounded-lg border-0 shadow-sm">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="text-sm text-gray-600">
-                    <ClockCircleOutlined /><span class="font-semibold pl-2">{{ serviceResult?.query }}</span>
-                  </div>
-                  <!--
-                  <div v-if="curKeyType == 'case'" class="divide-x divide-gray-300 flex items-center text-xs text-gray-500 pt-4">
-                    <div
-                      :class="['px-2','cursor-pointer','font-bold',{'text-red-600': curFilterKey == tab.key}]"
-                      v-for="tab in CASE_FILTER"
-                      :key="tab.key"
-                      @click="curFilterKey = tab.key"
-                    >{{ tab.label }}</div>
-                  </div>
-                  -->
-                </div>
-                <a-select
-                  v-model:value="sortRule"
-                  class="w-[100px] border-none"
-                  :dropdownMatchSelectWidth="false"
-                  @change="loadHistoryResults"
-                >
-                  <a-select-option
-                    v-for="option in (SORT_OPTIONS as any)[curKeyType]"
-                    :key="option.value"
-                    :value="option.value"
-                    :title="option.label"
-                  >{{ option.label }}</a-select-option>
-                </a-select>
-              </div>
-            </div>
-
-            <!-- 结果卡片列表  searchResults -->
-            <div class="flex-1 overflow-y-auto">
-              <a-list
-                item-layout="vertical" size="large"  :data-source="searchResults"
-              >
-                <template #renderItem="{item}">
-                  <a-list-item :key="item?.similarity">
-                    <a-list-item-meta>
-                      <template #title>
-                        <div class="flex items-center justify-between gap-2">
-                          <div
-                            class="text-red-600 line-clamp-1 cursor-pointer font-bold"
-                            @click="openIframe(formatLawData(item).id,formatLawData(item).title)"
-                          >{{ formatLawData(item).title }}</div>
-                          <a-tag color="error">{{ formatLawData(item).timeliness }}</a-tag>
-                        </div>
-                      </template>
-                      <template #description>
-                        <div>
-                          <!-- 标题头部信息 -->
-                          <div class="text-xs text-gray-400 divide-x divide-gray-300 flex items-center pb-2">
-                            <template v-if="curKeyType == 'law'">
-                              <template v-for="law in LAW_TITLE_KEY" :key="law.key">
-                                <div v-if="!!(formatLawData(item) as any)[law.key]" class="px-2">{{ (formatLawData(item) as any)[law.key] }}{{law.suffix ? ` ${law.suffix}` : ''}}</div>
-                              </template>
-                            </template>
-                            <template v-if="curKeyType == 'case'">
-                              <template v-for="c in ['caseCause','caseNo','trialDate','trialLevel']" :key="c">
-                                <div class="px-2" v-if="!!formatLawData(item).domain?.[c]">{{ formatLawData(item).domain?.[c] }}</div>
-                              </template>
-                            </template>
-                          </div>
-
-                          <!-- 内容信息 -->
-                          <div class="bg-gray-50 rounded-md py-2 px-4 text-gray-700 text-xs">
-                            <div v-if="curKeyType == 'law'" class="m-0 p-0 line-clamp-[8]">{{ formatLawData(item).content }}</div>
-                            <div class="m-0 p-0" v-if="curKeyType == 'case'">
-                              <div class="text-xs text-gray-400 divide-x divide-gray-300 flex items-center p-2">
-                                <div
-                                  v-for="(key,n) in ['courtThink','verdict']"
-                                  :key="key"
-                                  @click="() => {
-                                    item.caseTabKey = key
-                                    console.log('当前',item);
-                                  }"
-                                  :class="['cursor-pointer','px-2',{'text-red-600': item.caseTabKey ? item.caseTabKey == key : n == 0}]"
-                                >{{ caseItemTabLabel(key) }}</div>
-                              </div>
-                              <div class="line-clamp-[8]">{{ (formatLawData(item) as any)?.[item?.caseTabKey || 'courtThink'] }}</div>
-                            </div>
-                          </div>
-                        </div>
-                      </template>
-                    </a-list-item-meta>
-                  </a-list-item>
-                </template>
-              </a-list>
-            </div>
-          </div>
-
-          <!-- 空状态 -->
-          <div v-else class="pt-[20vh] text-gray-400">
-            <a-empty
-              :description="`暂无${curMenuItem.type === 'law' ? '法条' : '案例'}检索结果`"
-            />
-          </div>
+        <!-- 空状态 -->
+        <div v-else class="pt-[20vh] text-gray-400">
+          <a-empty
+            :description="`暂无${curMenuItem.type === 'law' ? '法条' : '案例'}检索结果`"
+          />
         </div>
       </div>
     </div>
@@ -438,6 +422,21 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
 
 <style scoped lang="scss">
 .case-box{
+  .title{
+    font-size: 18px;
+    line-height: 18px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    &::before{
+      content: '';
+      display: inline-block;
+      width: 4px;
+      background-color: #ff4d4f;
+      height: 16px;
+      margin-right: 8px;
+    }
+  }
   &:deep(.ant-select-selector){
     border: none;
     background: transparent;

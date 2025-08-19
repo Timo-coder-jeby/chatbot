@@ -82,6 +82,9 @@ module.exports = {
         '.border': {
           'border-width': '1px',
           'border-style': 'solid',
+        },
+        '.border-b-c': {
+          'border-bottom': '1px solid #e5e7eb', // Tailwind's gray-200
         }
       })
     }
