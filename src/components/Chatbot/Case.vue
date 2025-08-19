@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, inject, computed, watch } from 'vue'
-import { SearchOutlined, FileSearchOutlined, DownOutlined,ClockCircleOutlined } from '@ant-design/icons-vue'
+
+import IframeCot from './IframeCot.vue'
+import { SearchOutlined, FileSearchOutlined,ClockCircleOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { type IAIService } from '@/services/aiService.ts'
 
@@ -39,6 +41,11 @@ const searchResults = ref<any[]>([])
 const isSearching = ref(false)
 const serviceResult:any = ref(null)
 const sortRule = ref('similarity')
+
+const iframeVisible = ref<boolean>(false)
+const iframeUrl = ref<string>('')
+const iframeTitle = ref<string>('')
+
 const currentPage = ref(1)
 const pageSize = ref(10)
 
@@ -49,6 +56,13 @@ const LAW_TITLE_KEY = [
   { key: 'releaseDate', suffix: '公布' },
   { key: 'implementDate', suffix: '施行' }
 ]
+
+const openIframe = (id: string, title: string) => {
+  'https://tongyi.aliyun.com/farui/caseDetail/86ae7501d20167f2fc6e86405439e626'
+  iframeUrl.value = `https://tongyi.aliyun.com/farui/${curKeyType.value}Detail/${id}`
+  iframeTitle.value = title
+  iframeVisible.value = true
+}
 
 /**
  * 建议搜索词条
@@ -197,6 +211,7 @@ const formatLawData = (item: any) => {
   const issuingOrgan = (domain.issuingOrgan && JSON.parse(domain.issuingOrgan)) || ''
   return {
     domain,
+    id: domain[`${curKeyType.value}Id`],
     title: domain[`${curKeyType.value}Name`] || domain?.[`${curKeyType.value}Title`] || '未知法规',
     content: stripRN(domain?.[`${curKeyType.value}SourceContent`] || ''),
     similarity: item.similarity || '0',
@@ -323,7 +338,10 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
                     <a-list-item-meta>
                       <template #title>
                         <div class="flex items-center justify-between gap-2">
-                          <div class="text-blue-600 line-clamp-1 cursor-pointer">{{ formatLawData(item).title }}</div>
+                          <div
+                            class="text-blue-600 line-clamp-1 cursor-pointer"
+                            @click="openIframe(formatLawData(item).id,formatLawData(item).title)"
+                          >{{ formatLawData(item).title }}</div>
                           <a-tag color="processing">{{ formatLawData(item).timeliness }}</a-tag>
                         </div>
                       </template>
@@ -379,6 +397,12 @@ const caseItemTabLabel = computed(() => (tabKey:string) => {
         </div>
       </div>
     </div>
+    <IframeCot
+      :visible="iframeVisible"
+      :url="iframeUrl"
+      :title="iframeTitle"
+      @close="iframeVisible = false"
+    />
   </div>
 </template>
 

@@ -143,18 +143,8 @@ const openInNewWindow = () => {
   transition: all 0.2s ease;
 
   &:hover {
-    background: #e5e7eb;
-    color: #374151;
-  }
-
-  &.close-btn:hover {
-    background: #fef2f2;
-    color: #dc2626;
-  }
-
-  &.refresh-btn:hover {
-    background: #f0fdf4;
-    color: #16a34a;
+    color: rgb(44, 121, 241);
+    transform: scale(1.1);
   }
 }
 

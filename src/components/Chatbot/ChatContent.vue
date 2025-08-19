@@ -1,58 +1,3 @@
-<template>
-  <div class="chat-content" :class="{ 'has-iframe': iframeVisible }">
-    <!-- 聊天消息区域 -->
-    <div class="chat-messages" v-if="allMessages.length > 0" ref="chatMessagesRef">
-      <div v-for="message in allMessages" :key="message.key" class="message-item">
-        <AXBubble
-          :placement="message.role === 'user' ? 'end' : 'start'"
-          :content="message.content"
-          :messageRender="message.role === 'assistant' ? renderMarkdown : undefined"
-          :typing="message.isTyping"
-          :avatar="message.role === 'user' ? {
-            icon: h(UserOutlined),
-            style: {
-              backgroundColor: '#00b96b',
-              color: '#fff'
-            }
-          } : { src: robotImg }"
-          :styles="{
-            content: {
-              backgroundColor: message.role === 'user' ? '#b7eb8f' : '#fff',
-              padding: '16px',
-              border: message.role === 'assistant' ? '1px solid #e5e7eb' : 'none',
-              borderRadius: '12px',
-              boxShadow: message.role === 'assistant' ? '0 1px 3px rgba(0, 0, 0, 0.1)' : 'none'
-            }
-          }"
-        />
-      </div>
-    </div>
-
-    <!-- 信息（仅在无消息时显示） -->
-    <h3 v-else class="tips">有什么可以帮助您的吗？</h3>
-
-    <!-- Sender 输入组件 -->
-    <div class="sender-area">
-      <AXSender
-          :autoSize="{ minRows: 3, maxRows: 6 }"
-          :loading="isTyping"
-          placeholder="输入消息..."
-          @submit="handleSendMessage"
-          @cancel="onCancel"
-          v-model:value="inputValue"
-      />
-    </div>
-
-    <!-- IframeCot 组件 - 抽屉式显示 -->
-    <IframeCot
-      :visible="iframeVisible"
-      :url="iframeUrl"
-      :title="iframeTitle"
-      @close="iframeVisible = false"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, h, nextTick, watch, computed } from 'vue'
 import { UserOutlined } from '@ant-design/icons-vue'
@@ -288,6 +233,60 @@ defineExpose({
   openIframe
 })
 </script>
+<template>
+  <div class="chat-content" :class="{ 'has-iframe': iframeVisible }">
+    <!-- 聊天消息区域 -->
+    <div class="chat-messages" v-if="allMessages.length > 0" ref="chatMessagesRef">
+      <div v-for="message in allMessages" :key="message.key" class="message-item">
+        <AXBubble
+          :placement="message.role === 'user' ? 'end' : 'start'"
+          :content="message.content"
+          :messageRender="message.role === 'assistant' ? renderMarkdown : undefined"
+          :typing="message.isTyping"
+          :avatar="message.role === 'user' ? {
+            icon: h(UserOutlined),
+            style: {
+              backgroundColor: '#00b96b',
+              color: '#fff'
+            }
+          } : { src: robotImg }"
+          :styles="{
+            content: {
+              backgroundColor: message.role === 'user' ? '#b7eb8f' : '#fff',
+              padding: '16px',
+              border: message.role === 'assistant' ? '1px solid #e5e7eb' : 'none',
+              borderRadius: '12px',
+              boxShadow: message.role === 'assistant' ? '0 1px 3px rgba(0, 0, 0, 0.1)' : 'none'
+            }
+          }"
+        />
+      </div>
+    </div>
+
+    <!-- 信息（仅在无消息时显示） -->
+    <h3 v-else class="tips">有什么可以帮助您的吗？</h3>
+
+    <!-- Sender 输入组件 -->
+    <div class="sender-area">
+      <AXSender
+        :autoSize="{ minRows: 3, maxRows: 6 }"
+        :loading="isTyping"
+        placeholder="输入消息..."
+        @submit="handleSendMessage"
+        @cancel="onCancel"
+        v-model:value="inputValue"
+      />
+    </div>
+
+    <!-- IframeCot 组件 - 抽屉式显示 -->
+    <IframeCot
+      :visible="iframeVisible"
+      :url="iframeUrl"
+      :title="iframeTitle"
+      @close="iframeVisible = false"
+    />
+  </div>
+</template>
 
 <style scoped lang="scss">
 @keyframes fadeInUp {
