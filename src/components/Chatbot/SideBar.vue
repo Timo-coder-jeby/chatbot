@@ -122,8 +122,8 @@ const handleMenuClick = (e: any, conversationKey: string) => {
     </div>
 
     <!-- 对话列表 -->
-    <div class="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-red-200 scrollbar-track-red-50">
-      <div class="flex items-center justify-between mb-4 px-3 py-2">
+    <div class="flex-1 overflow-hidden scrollbar-thin scrollbar-thumb-red-200 scrollbar-track-red-50 flex flex-col">
+      <div class="flex items-center justify-between mb-4 p-4 border-b-c">
         <div class="flex items-center gap-2">
           <MessageOutlined class="text-red-500 text-base" />
           <span class="text-sm font-semibold text-slate-600">最近对话</span>
@@ -142,7 +142,7 @@ const handleMenuClick = (e: any, conversationKey: string) => {
         </a-button>
       </div>
 
-      <div class="space-y-4">
+      <div class="space-y-4 flex-1 overflow-y-auto px-4 pb-4">
         <div
           v-for="conversation in conversationList"
           :key="conversation.key"
