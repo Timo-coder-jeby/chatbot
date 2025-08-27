@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ChatBot from '@/components/Chatbot/index.vue'
+import ChatBot from '@/views/Chatbot/index.vue'
 
 // 配置红色主题
 const theme = {

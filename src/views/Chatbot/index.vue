@@ -34,7 +34,7 @@
 
       <!-- 法律检索和案例检索时显示Case组件 -->
       <Case
-        v-else
+        v-if="curMenuItem.type === 'case' || curMenuItem.type === 'law'"
         :curMenuItem="curMenuItem"
         :conversationList="conversationList"
         :activeConversationKey="activeConversationKey"
@@ -55,9 +55,9 @@ import {
 } from '@ant-design/icons-vue'
 import { type IAIService, type ConversationItem, type MessageItem } from '@/services/aiService.ts'
 
-import SideBar from "./SideBar.vue";
-import ChatContent from "./ChatContent.vue";
-import Case from "./Case.vue";
+import SideBar from "./components/SideBar.vue";
+import ChatContent from "./components/ChatContent.vue";
+import Case from "./components/Case.vue";
 
 const aiService = inject<IAIService>('aiService')!
 
@@ -477,5 +477,5 @@ const handleMenuChange = async (index: number) => {
 </script>
 
 <style lang="scss" scoped>
-@use './index';
+@use 'index';
 </style>
