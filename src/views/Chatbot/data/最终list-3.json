@@ -1,0 +1,890 @@
+{
+  "code": 200,
+  "data": {
+    "completionPrompt": "true",
+    "result": [
+      {
+        "ruleTitle": "简要审查合同的主要条款",
+        "subRules": [
+          {
+            "examineBrief": "本任务为审查合同主体信息的完整性与适格性，合同中虽列有甲乙双方姓名，但身份证号、联系电话等关键信息均为空白，未注明住所地，缺乏对民事行为能力的确认及信息真实性承诺。合同文本存在缺陷，可能导致主体无法识别或争议时难以追责，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "medium",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 1,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "出租人（甲方）：韩梅梅\n身份证号：________________________\n联系电话：________________________\n承租人（乙方）：李雷\n身份证号：________________________\n联系电话：________________________\n",
+                "relatedRisk": false,
+                "resultContent": "出租人（甲方）：韩梅梅\n性别：女\n住所地：北京市朝阳区\n身份证号码：11010119900101xxxx\n联系方式：1390013xxxx\n出生日期：1990年01月01日\n现工作单位及职务信息：北京XX公司，经理\n\n承租人（乙方）：李雷\n性别：男\n住所地：北京市海淀区\n身份证号码：11010119900101xxxx\n联系方式：1390013xxxx\n出生日期：1990年01月01日\n现工作单位及职务信息：北京XX公司，工程师\n\n甲方为具备完全民事行为能力的自然人，乙方为具备完全民事行为能力的自然人，双方经审查均具备签订本合同的主体资格。双方在此确认上述信息真实、完整、准确、无误，并愿意承担由于信息不真实、不完整、不准确、有误引起的一切法律责任。",
+                "resultType": "更正",
+                "riskBrief": "主体信息不完整",
+                "riskClause": "合同当事人",
+                "riskExplain": "合同中虽然列有甲乙双方姓名，但身份证号、联系电话等关键信息均为空白，未注明住所地，缺乏对民事行为能力的确认及信息真实性承诺。合同文本存在缺陷，可能导致主体无法识别或争议时难以追责。",
+                "riskId": "50863034",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "d779e4c9-5cfc-46c7-aa69-67fdc051c855",
+            "subRuleIndex": "1",
+            "subRuleSequence": "1.18",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同主体条款中，合同主体信息是否准确、是否适格"
+          },
+          {
+            "examineBrief": "本任务为审查租赁合同中出租人是否为标的物权利人，合同中未明确出租人韩梅梅是否为该房屋的合法所有者，也未提供产权证书或其他权利证明文件。合同文本存在缺陷，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "medium",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 1,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "出租人（甲方）：韩梅梅\n身份证号：________________________\n联系电话：________________________\n",
+                "relatedRisk": false,
+                "resultContent": "出租人（甲方）：韩梅梅\n身份证号：________________________\n联系电话：________________________\n\n**第二条 出租人权利的声明和保证：**\n\n出租人现声明并保证，出租人为租赁标的物的合法所有者（或有产权人的明确授权）。如租赁标的物存在共有权人，共有权人已充分知晓并同意此次租赁事项。\n\n出租人应向承租人提供足够的证据，证明其对租赁标的物具有完全的出租权利，包括但不限于权利证明、产权证书、共有权人的同意书等。\n\n以上提供的信息，总体公正、准确、完整，不存在任何误导性陈述，也没有遗漏任何可能使已提供的信息产生重大影响的事实。",
+                "resultType": "更正",
+                "riskBrief": "未明确出租人是否为房屋合法所有者",
+                "riskClause": "合同主体条款",
+                "riskExplain": "合同中未明确出租人是否为房屋合法所有者，也未提供产权证书或其他权利证明文件，存在潜在风险。这可能导致承租人在租赁期间面临房屋产权纠纷，影响租赁关系的稳定性。",
+                "riskId": "50863012",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "3d428689-1e4d-46be-8c65-fdb0ed35bd4d",
+            "subRuleIndex": "2",
+            "subRuleSequence": "1.19",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同主体条款中，出卖人是否为标的物权利人"
+          },
+          {
+            "examineBrief": "本任务为审查租赁物条款中标的物特征是否表述全面，合同中已经较为详细地描述了租赁物的特征，包括房屋坐落、用途、面积、设施等，但未明确房屋类型和合法性证明。合同文本存在缺陷，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "high",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 1,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "房屋坐落：北京市朝阳区八里庄街道远洋国际中心 2010 室（以下简称 “该房屋”）\n房屋用途：仅作为住宅使用，乙方不得擅自改变用途（如改为办公、经营等）\n房屋面积：产权证登记建筑面积______平方米（以房屋产权证为准）\n",
+                "relatedRisk": false,
+                "resultContent": "房屋坐落：北京市朝阳区八里庄街道远洋国际中心 2010 室（以下简称 “该房屋”）\n房屋类型：公寓\n房屋用途：仅作为住宅使用，乙方不得擅自改变用途（如改为办公、经营等）\n房屋面积：产权证登记建筑面积______平方米（以房屋产权证为准）\n房屋设施：家电、家具、水电气表等\n房屋合法性证明：甲方保证该房屋已取得所有必需的许可和批准，并遵守所有适用的法律和规定。",
+                "resultType": "更正",
+                "riskBrief": "房屋类型和合法性证明未明确",
+                "riskClause": "租赁房屋基本情况",
+                "riskExplain": "合同中未明确房屋类型和合法性证明，可能导致租赁物合法性存疑，影响合同的有效性。",
+                "riskId": "50863026",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "67fe8e0d-8d99-4e64-85e4-1f9c6d9a5ee9",
+            "subRuleIndex": "3",
+            "subRuleSequence": "1.24",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同租赁物条款中，标的物特征是否表述全面"
+          },
+          {
+            "examineBrief": "本任务为审查租赁合同中租赁物是否特定且明确，合同中虽约定了房屋具体地址，但未填写产权证号、实际面积、设施数量及水电气表初始读数等关键信息。合同文本存在缺陷，可能导致交付验收、费用结算及责任认定不清，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "high",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 1,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "房屋面积：产权证登记建筑面积______平方米（以房屋产权证为准）\n房屋设施：甲方保证该房屋交付时，以下设施完好且能正常使用：\n家电：空调____台、冰箱____台、洗衣机____台、热水器____台、燃气灶____台、油烟机____台；\n家具：床____张、衣柜____组、沙发____套、餐桌____张、餐椅____把；\n其他：水表（初始读数：）、电表（初始读数：）、燃气表（初始读数：______）。",
+                "relatedRisk": false,
+                "resultContent": "房屋面积：产权证登记建筑面积___平方米（以房屋产权证为准），产权证号：___。\n房屋设施：甲方保证该房屋交付时，以下设施完好且能正常使用：\n家电：空调___台、冰箱___台、洗衣机___台、热水器___台、燃气灶___台、油烟机___台；\n家具：床___张、衣柜___组、沙发___套、餐桌___张、餐椅___把；\n其他：水表（初始读数：___）、电表（初始读数：___）、燃气表（初始读数：___）。\n双方应在交付当日签署《房屋设施交接清单》（作为本合同附件），列明上述设施的品牌、型号、数量及表计读数，经双方签字确认后生效。",
+                "resultType": "更正",
+                "riskBrief": "租赁房屋基本信息不完整",
+                "riskClause": "第二条 租赁房屋基本情况",
+                "riskExplain": "房屋面积、设施数量、水电气表初始读数等关键信息未填写，可能导致交付验收争议、使用费用分摊不清及责任归属困难。",
+                "riskId": "50863020",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "6b44b13f-110f-4aa1-adb1-62aa4b532bab",
+            "subRuleIndex": "4",
+            "subRuleSequence": "1.22",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同租赁物条款中，标的物名称表述是否特定"
+          },
+          {
+            "examineBrief": "本任务为审查租赁物是否合法的问题，合同中未明确租赁物是否已取得建设工程规划许可证，也未提及租赁物的合法性保障措施。合同文本存在缺陷，未明确租赁物是否已取得建设工程规划许可证，这可能导致租赁合同无效的风险，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "high",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 1,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "第二条 租赁房屋基本情况\n房屋坐落：北京市朝阳区八里庄街道远洋国际中心 2010 室（以下简称 “该房屋”）\n房屋用途：仅作为住宅使用，乙方不得擅自改变用途（如改为办公、经营等）\n房屋面积：产权证登记建筑面积______平方米（以房屋产权证为准）\n房屋设施：甲方保证该房屋交付时，以下设施完好且能正常使用：\n家电：空调____台、冰箱____台、洗衣机____台、热水器____台、燃气灶____台、油烟机____台；\n家具：床____张、衣柜____组、沙发____套、餐桌____张、餐椅____把；\n其他：水表（初始读数：）、电表（初始读数：）、燃气表（初始读数：______）。\n（双方可另附《房屋设施交接清单》，签字确认后作为本合同附件）",
+                "relatedRisk": false,
+                "resultContent": "第二条 租赁房屋基本情况\n房屋坐落：北京市朝阳区八里庄街道远洋国际中心 2010 室（以下简称 “该房屋”）\n房屋用途：仅作为住宅使用，乙方不得擅自改变用途（如改为办公、经营等）\n房屋面积：产权证登记建筑面积______平方米（以房屋产权证为准）\n房屋设施：甲方保证该房屋交付时，以下设施完好且能正常使用：\n家电：空调____台、冰箱____台、洗衣机____台、热水器____台、燃气灶____台、油烟机____台；\n家具：床____张、衣柜____组、沙发____套、餐桌____张、餐椅____把；\n其他：水表（初始读数：）、电表（初始读数：）、燃气表（初始读数：______）。\n（双方可另附《房屋设施交接清单》，签字确认后作为本合同附件）\n\n2.1 承租人确认，租赁物已取得了由主管部门颁发的建设工程规划许可证，其编号为_______（填写许可证编号）。\n2.2 除非在一审法庭辩论终结前获得建设工程规划许可证或者得到主管部门的批准建设，否则如果租赁物未能满足以上条件，本租赁合同将视为无效。\n2.3 出租人保证租赁物的使用没有任何法律上的禁止和限制，全权负责处理和解决因租赁物产权瑕疵、所有权瑕疵或使用权瑕疵产生的一切问题，及时消除对承租人的影响，保证承租人的正常使用。",
+                "resultType": "更正",
+                "riskBrief": "未明确租赁物是否已取得建设工程规划许可证",
+                "riskClause": "租赁房屋基本情况",
+                "riskExplain": "合同文本未明确租赁物是否已取得建设工程规划许可证，这可能导致租赁合同无效的风险。",
+                "riskId": "50863021",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "35cbdfd5-f848-4724-a7f2-3a94c6f9247d",
+            "subRuleIndex": "5",
+            "subRuleSequence": "1.25",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同租赁物条款中，租赁物是否合法"
+          },
+          {
+            "examineBrief": "本任务为审查租赁合同中是否约定免租期，合同中仅约定了租赁起止时间和首期租金支付时间，但未明确房屋交付日与计租起始日之间的关系，也未设置免租期条款。合同文本存在缺陷，可能使乙方在未实际使用房屋前即开始承担租金义务，对乙方不利。应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "high",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 1,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "租赁期限自______年____月____日起至______年____月____日止，共计 3 年。",
+                "relatedRisk": false,
+                "resultContent": "租赁期限自______年____月____日起至______年____月____日止，共计 3 年。双方同意，自房屋交付之日起______日内为免租期，用于乙方搬迁及房屋准备，免租期内乙方无需支付租金，但应承担水、电、燃气等实际使用费用。租金自免租期届满次日起计算。",
+                "resultType": "更正",
+                "riskBrief": "未约定免租期",
+                "riskClause": "第三条 租赁期限",
+                "riskExplain": "合同未设置免租期，租金自租赁起始日起算，乙方可能在未实际使用房屋前即承担租金义务，处于不利地位。",
+                "riskId": "50863011",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "9c42f4c1-1ab6-4e5e-b378-c2ccd955ffbf",
+            "subRuleIndex": "6",
+            "subRuleSequence": "1.26",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同租赁期限条款中，是否约定免租期"
+          },
+          {
+            "examineBrief": "本任务为审查合同终止的情形以及合同终止后相关后续事宜的处理。合同中未明确约定租赁物因不可抗力或其他原因损毁、灭失或被依法征收时的具体处理方式，未详细约定合同终止后关于征收补偿费用的分享事宜，也未明确约定合同解除后押金的处理方式。合同文本存在缺陷，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "high",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 3,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "租赁期满，本合同自动终止。乙方如需续租，应在租赁期满前 30 日书面通知甲方，经甲方同意后，双方重新签订租赁合同。",
+                "relatedRisk": false,
+                "resultContent": "租赁期满，本合同自动终止。乙方如需续租，应在租赁期满前 30 日书面通知甲方，经甲方同意后，双方重新签订租赁合同。如果租赁物因不可抗力或其他任何原因全部或部分被毁损、灭失，或者被依法征收，出租人和承租人都可以选择终止此合同。",
+                "resultType": "更正",
+                "riskBrief": "未明确约定租赁物因不可抗力或其他原因损毁、灭失或被依法征收时的具体处理方式",
+                "riskClause": "合同终止条款",
+                "riskExplain": "合同中未明确约定租赁物因不可抗力或其他原因损毁、灭失或被依法征收时的具体处理方式，可能导致合同终止后双方无据可依而产生争议。",
+                "riskId": "50863023",
+                "riskStatus": "success"
+              },
+              {
+                "accept": 0,
+                "originalContent": "本合同履行过程中发生争议，双方应协商解决；协商不成，可向该房屋所在地（北京市朝阳区）人民法院提起诉讼。",
+                "relatedRisk": false,
+                "resultContent": "如果租赁物被依法征收，征收补偿费用由出租人和承租人按合同约定比例分享。具体分享比例为：出租人占___%，承租人占___%。",
+                "resultType": "新增",
+                "riskBrief": "未详细约定合同终止后关于征收补偿费用的分享事宜",
+                "riskClause": "合同终止后的后续事项",
+                "riskExplain": "合同中未详细约定合同终止后关于征收补偿费用的分享事宜，可能导致合同终止后双方无据可依而产生争议。",
+                "riskId": "50863024",
+                "riskStatus": "success"
+              },
+              {
+                "accept": 0,
+                "originalContent": "租赁期满乙方无违约且腾退房屋后，甲方在 7 个工作日内将押金无息退还。",
+                "relatedRisk": false,
+                "resultContent": "租赁期满或合同解除后，乙方无违约且腾退房屋后，甲方在 7 个工作日内将押金无息退还。若因乙方违约导致合同解除，甲方有权从押金中扣除相应费用，不足部分可向乙方追偿。",
+                "resultType": "更正",
+                "riskBrief": "未明确约定合同解除后押金的处理方式",
+                "riskClause": "押金处理条款",
+                "riskExplain": "合同中未明确约定合同解除后押金的处理方式，可能导致合同解除后双方无据可依而产生争议。",
+                "riskId": "50863025",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "8ae8a293-c297-475f-b811-06025b6160b5",
+            "subRuleIndex": "7",
+            "subRuleSequence": "1.0",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同终止条款中，包括合同终止的情形以及合同终止后相关后续事宜的处理等"
+          },
+          {
+            "examineBrief": "本任务为发票条款的规范性与完整性审核，合同中未明确规定发票开具时间、发票与付款次序、发票类型及纳税人类型、发票信息完整性、一致性核对及责任规定等内容。合同文本存在缺陷，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "high",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 6,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "第四条 租金及支付方式\n月租金标准：人民币 3000 元（大写：叁仟元整），租金包含该房屋基础物业费，不包含水、电、燃气、网络、有线电视等乙方使用产生的费用。",
+                "relatedRisk": true,
+                "resultContent": "4.1 发票开具时间：甲方应在每月租赁费用到期日的次日，为乙方开具相应的租赁发票。",
+                "resultType": "新增",
+                "riskBrief": "未明确规定发票开具时间",
+                "riskClause": "发票条款",
+                "riskExplain": "合同中未规定发票开具的具体时间，可能导致双方在实际操作中对开票时间有不同解读，进而引发争议。",
+                "riskId": "50863028",
+                "riskStatus": "success"
+              },
+              {
+                "accept": 0,
+                "originalContent": "第四条 租金及支付方式\n月租金标准：人民币 3000 元（大写：叁仟元整），租金包含该房屋基础物业费，不包含水、电、燃气、网络、有线电视等乙方使用产生的费用。",
+                "relatedRisk": true,
+                "resultContent": "4.2 发票与付款次序：租赁费用应采取“先付款后开票”的方式进行。乙方在付款完成后，甲方有义务及时为乙方开具发票。",
+                "resultType": "新增",
+                "riskBrief": "未规定发票与付款次序",
+                "riskClause": "发票条款",
+                "riskExplain": "合同中未明确付款与开票的次序，可能导致双方在实际操作中对付款和开票顺序有不同解读，进而引发争议。",
+                "riskId": "50863029",
+                "riskStatus": "success"
+              },
+              {
+                "accept": 0,
+                "originalContent": "第四条 租金及支付方式\n月租金标准：人民币 3000 元（大写：叁仟元整），租金包含该房屋基础物业费，不包含水、电、燃气、网络、有线电视等乙方使用产生的费用。",
+                "relatedRisk": true,
+                "resultContent": "4.3 发票类型与纳税人类型：本合同所涉及的发票为增值税专用发票，且甲方为一般纳税人，乙方为小规模纳税人。",
+                "resultType": "新增",
+                "riskBrief": "未确认发票类型及纳税人类型",
+                "riskClause": "发票条款",
+                "riskExplain": "合同中未确认发票类型及纳税人类型，可能导致税务处理上的混乱，增加税务风险。",
+                "riskId": "50863030",
+                "riskStatus": "success"
+              },
+              {
+                "accept": 0,
+                "originalContent": "第四条 租金及支付方式\n月租金标准：人民币 3000 元（大写：叁仟元整），租金包含该房屋基础物业费，不包含水、电、燃气、网络、有线电视等乙方使用产生的费用。",
+                "relatedRisk": true,
+                "resultContent": "4.4 完整性检验：发票信息应包括但不限于甲乙双方的名称、纳税人识别号、租赁物品、租赁周期、租赁费用等内容。",
+                "resultType": "新增",
+                "riskBrief": "未进行发票信息完整性检验",
+                "riskClause": "发票条款",
+                "riskExplain": "合同中未详细列出所有必要的发票信息，可能导致发票信息不完整，增加税务风险。",
+                "riskId": "50863031",
+                "riskStatus": "success"
+              },
+              {
+                "accept": 0,
+                "originalContent": "第四条 租金及支付方式\n月租金标准：人民币 3000 元（大写：叁仟元整），租金包含该房屋基础物业费，不包含水、电、燃气、网络、有线电视等乙方使用产生的费用。",
+                "relatedRisk": true,
+                "resultContent": "4.5 一致性核对：发票抬头需与合同签订的主体一致。甲方开具的发票的抬头为“___公司”，纳税人识别号为“___”。",
+                "resultType": "新增",
+                "riskBrief": "未进行一致性核对",
+                "riskClause": "发票条款",
+                "riskExplain": "合同中未确保发票抬头与签订合同的主体一致性，可能导致税务处理上的混乱，增加税务风险。",
+                "riskId": "50863032",
+                "riskStatus": "success"
+              },
+              {
+                "accept": 0,
+                "originalContent": "第四条 租金及支付方式\n月租金标准：人民币 3000 元（大写：叁仟元整），租金包含该房屋基础物业费，不包含水、电、燃气、网络、有线电视等乙方使用产生的费用。",
+                "relatedRisk": true,
+                "resultContent": "4.6 责任规定：甲方若违规开票或延迟开票，乙方有权要求甲方承担因此造成的损失并支付违约金。同时，甲方应立即改正错误并重新为乙方开具符合规定的发票。违约金的具体数额参照合同的违约条款设定。",
+                "resultType": "新增",
+                "riskBrief": "未规定责任",
+                "riskClause": "发票条款",
+                "riskExplain": "合同中未明确规定违规开票或延迟开票的责任，可能导致甲方违规开票或延迟开票时乙方难以获取合理的补偿，增加乙方的损失。",
+                "riskId": "50863033",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "00e1c63c-eb6e-44f9-9b70-32a20ce77aa0",
+            "subRuleIndex": "8",
+            "subRuleSequence": "1.7",
+            "subRuleStatus": "success",
+            "subRuleTitle": "发票条款的规范性与完整性审核"
+          },
+          {
+            "examineBrief": "本任务为房屋租赁合同中关于租赁物装修装饰问题的审查，合同中仅禁止乙方擅自拆改结构，但未规定装修装饰是否需事先征得甲方同意、是否需提交方案、如何处理装修成果等关键内容。合同文本存在缺陷，可能导致乙方在合理装修时面临违约风险或无法保留装修价值，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "high",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 1,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "乙方应合理使用该房屋及设施，不得擅自拆改、变动房屋结构（如打墙、改水电等），不得损坏房屋装修及设施。因乙方过错导致损坏的，乙方需在 7 日内修复或赔偿损失。",
+                "relatedRisk": false,
+                "resultContent": "6. 装修装饰\n\n1. 承租人如需对租赁物进行装修装饰，必须事先书面形式向出租人提出，并附上详细的装修装饰方案，包括但不限于装修装饰的设计、材料、施工方案等内容。\n\n2. 出租人应在收到承租人的装修装饰申请后，于___（请填写具体时间，比如7个工作日内）内进行审查，并书面形式回复承租人是否同意。\n\n3. 若出租人对承租人的装修装饰方案有任何异议，承租人应当据此调整装修装饰方案，直至出租人同意为止。\n\n4. 在装修装饰过程中，承租人不得对租赁物的主体结构进行破坏。如有特殊情况需要改变主体结构，承租人应提前书面向出租人申请，经出租人同意后方可进行。\n\n5. 合同终止后，承租人应恢复租赁物原状，除非出租人书面同意接受装修装饰后的状态。\n\n6. 如承租人未经出租人同意，对租赁物进行装修装饰，或在装修装饰过程中破坏租赁物的主体结构，出租人有权要求承租人恢复原状或赔偿损失。\n\n上述约定若违反，出租方有权终止本合同，并保留追究其法律责任的权利。",
+                "resultType": "新增",
+                "riskBrief": "未规定装修装饰是否需事先征得甲方同意、是否需提交方案、如何处理装修成果等关键内容",
+                "riskClause": "租赁物的使用条款",
+                "riskExplain": "合同中未规定装修装饰是否需事先征得甲方同意、是否需提交方案、如何处理装修成果等关键内容，可能导致乙方在合理装修时面临违约风险或无法保留装修价值。",
+                "riskId": "50863027",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "18357eb0-7ecb-42ae-aa6c-d158780d175b",
+            "subRuleIndex": "9",
+            "subRuleSequence": "1.12",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同租赁物的使用条款中，关于租赁物的装修装饰问题"
+          },
+          {
+            "examineBrief": "本任务为审查租赁物交付条款中交付时间、交付条件、交付方式是否完备明确，合同中虽约定了交付时间和交付方式的部分内容，但未明确将《房屋设施交接清单》作为必备附件，且未规定交付时房屋应符合安全健康标准。合同文本存在缺陷，可能影响乙方在交付环节的合法权益，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "high",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 2,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "甲方应在本合同签订当日将该房屋交付乙方，交付时双方共同查验房屋及设施，签署《房屋设施交接清单》，清单内容与本合同第二条第 4 款一致。",
+                "relatedRisk": true,
+                "resultContent": "甲方应在本合同签订当日将该房屋交付乙方，交付时双方共同查验房屋及设施，确保房屋符合安全健康标准，并签署《房屋设施交接清单》。该交接清单作为本合同的必备附件，双方签字确认后具有同等法律效力。",
+                "resultType": "更正",
+                "riskBrief": "未明确将《房屋设施交接清单》作为必备附件",
+                "riskClause": "房屋交付及腾退",
+                "riskExplain": "未明确将《房屋设施交接清单》作为必备附件，可能导致交付时双方对房屋及设施状态存在争议，影响乙方权益。",
+                "riskId": "50863009",
+                "riskStatus": "success"
+              },
+              {
+                "accept": 0,
+                "originalContent": "甲方应在本合同签订当日将该房屋交付乙方，交付时双方共同查验房屋及设施，签署《房屋设施交接清单》，清单内容与本合同第二条第 4 款一致。",
+                "relatedRisk": true,
+                "resultContent": "甲方应在本合同签订当日将该房屋交付乙方，交付时双方共同查验房屋及设施，确保房屋符合安全健康标准，并签署《房屋设施交接清单》。该交接清单作为本合同的必备附件，双方签字确认后具有同等法律效力。",
+                "resultType": "更正",
+                "riskBrief": "未规定交付时房屋应符合安全健康标准",
+                "riskClause": "房屋交付及腾退",
+                "riskExplain": "未规定交付时房屋应符合安全健康标准，可能导致乙方在入住后发现房屋存在安全隐患，影响乙方权益。",
+                "riskId": "50863010",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "63a58bbd-cb54-4195-8785-8a846cb48212",
+            "subRuleIndex": "10",
+            "subRuleSequence": "1.9",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同租赁物交付条款中，租赁物的交付时间、交付条件、交付方式是否完备、明确"
+          },
+          {
+            "examineBrief": "本任务为审查违约责任条款的全面性与合理性，合同中虽已设定多项违约责任，覆盖租金支付、房屋交付、维修义务、使用规范等方面，且违约金标准和解除条件具备可执行性。然而，合同未明确约定甲方交付房屋时设施不全或无法正常使用情形下的具体违约责任，亦未规定在甲方长期不履行维修义务时乙方的合同解除权，导致乙方在房屋使用严重受限时救济手段不足。合同文本存在缺陷，可能影响乙方权益保障，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "medium",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 2,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "甲方应在本合同签订当日将该房屋交付乙方，交付时双方共同查验房屋及设施，签署《房屋设施交接清单》。",
+                "relatedRisk": false,
+                "resultContent": "甲方应在本合同签订当日将该房屋交付乙方，交付时双方共同查验房屋及设施，签署《房屋设施交接清单》。如甲方交付的房屋设施不全或无法正常使用，甲方应在接到乙方通知后7日内修复或更换，逾期未修复或更换的，每逾期一日，甲方应按日租金的___%向乙方支付违约金；逾期超过___日，乙方有权解除合同，甲方需退还已收租金及押金，并赔偿乙方一个月租金（3000元）。",
+                "resultType": "更正",
+                "riskBrief": "未明确约定甲方交付房屋时设施不全或无法正常使用情形下的具体违约责任",
+                "riskClause": "违约责任条款",
+                "riskExplain": "合同未明确约定甲方交付房屋时设施不全或无法正常使用情形下的具体违约责任，可能导致乙方在房屋设施不全或无法正常使用时缺乏有效的救济手段。",
+                "riskId": "50863018",
+                "riskStatus": "success"
+              },
+              {
+                "accept": 0,
+                "originalContent": "未按约定维修房屋或设施，影响乙方正常使用，乙方有权要求甲方减免相应期间租金（",
+                "relatedRisk": false,
+                "resultContent": "未按约定维修房屋或设施，影响乙方正常使用，乙方有权要求甲方减免相应期间租金。如甲方在接到乙方通知后7日内仍未履行维修义务，乙方有权解除合同，甲方需退还已收未到期租金及押金，并赔偿乙方一个月租金（3000元）。",
+                "resultType": "更正",
+                "riskBrief": "未规定在甲方长期不履行维修义务时乙方的合同解除权",
+                "riskClause": "违约责任条款",
+                "riskExplain": "合同未规定在甲方长期不履行维修义务时乙方的合同解除权，可能导致乙方在甲方长期不履行维修义务时缺乏有效的救济手段。",
+                "riskId": "50863019",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "1ec68f2a-9838-44bb-813b-08d2af55ae3d",
+            "subRuleIndex": "11",
+            "subRuleSequence": "1.16",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同违约责任条款中，根据双方的合同义务确定违约责任"
+          },
+          {
+            "examineBrief": "本任务为审查租赁物返还时间及流程是否明确、是否包含验收程序，合同中虽约定了腾退时间和逾期责任，但未规定甲方应在接收房屋时进行验收、验收期限及标准，也未明确乙方对验收结果的异议权利。合同文本存在缺陷，可能使乙方在退租时处于被动地位，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "high",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 1,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "租赁期满或合同解除后，乙方应在 3 日内腾退房屋，将个人物品清空，保持房屋及设施完好（正常老化除外）。若乙方逾期腾退，每逾期 1 日按日租金 1.5 倍（即 150 元 / 日）向甲方支付违约金；逾期超过 7 日，甲方有权强制清场，乙方遗留物品视为放弃，甲方可自行处置。",
+                "relatedRisk": false,
+                "resultContent": "租赁期满或合同解除后，乙方应在 3 日内腾退房屋，将个人物品清空，保持房屋及设施完好（正常老化除外）。甲方应在乙方腾退当日或双方约定的时间内接收房屋，并于接收后5个工作日内依据《房屋设施交接清单》及本合同第二条约定的标准进行验收。如甲方认为房屋或设施存在非正常损坏，应书面通知乙方并提供相关证据。乙方有权在收到通知后3个工作日内提出异议并申请复核。若双方对验收结果存在争议，可共同委托第三方机构评估，费用由责任方承担。若乙方逾期腾退，每逾期 1 日按日租金 1.5 倍（即 150 元 / 日）向甲方支付违约金；逾期超过 7 日，甲方有权强制清场，乙方遗留物品视为放弃，甲方可自行处置。",
+                "resultType": "更正",
+                "riskBrief": "租赁物返还缺乏验收程序和异议机制",
+                "riskClause": "第七条 房屋交付及腾退",
+                "riskExplain": "合同未规定甲方在接收房屋时的验收义务、验收期限与标准，亦未赋予乙方对验收结果提出异议的权利，可能导致乙方在退租时被单方面认定违约或损坏，押金被不合理扣除，处于被动地位。",
+                "riskId": "50863022",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "5074cc7b-c69b-4741-ac36-fa225d55d98c",
+            "subRuleIndex": "12",
+            "subRuleSequence": "1.10",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同租赁物返还条款中，出租方交付租赁物和承租方交还租赁物，租赁物返还时间及流程，是否需要验收"
+          },
+          {
+            "examineBrief": "本任务为审查在非承租人原因导致租赁物无法使用时，承租人是否享有合同解除权的条款。合同中仅约定了协商解除、不可抗力解除及特定违约情形下的解除权，未明确纳入租赁物被查封、权属存在争议或违反使用条件等法定解除情形。合同文本存在缺陷，可能导致乙方行使法定权利时面临解释障碍或争议，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "high",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 1,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "第九条 合同解除\n经双方协商一致，可书面解除本合同。\n因不可抗力（如地震、火灾、政府征收等）导致房屋无法使用，本合同自动解除，双方互不承担违约责任，甲方退还已收未到期租金及押金。\n一方出现本合同第八条约定的违约情形，另一方有权书面通知违约方解除合同，违约方需承担相应责任。",
+                "relatedRisk": false,
+                "resultContent": "第九条 合同解除\n经双方协商一致，可书面解除本合同。\n因不可抗力（如地震、火灾、政府征收等）导致房屋无法使用，本合同自动解除，双方互不承担违约责任，甲方退还已收未到期租金及押金。\n一方出现本合同第八条约定的违约情形，另一方有权书面通知违约方解除合同，违约方需承担相应责任。\n非因乙方原因，有下列情形之一致使该房屋无法正常使用的，乙方有权书面通知甲方解除本合同：（一）该房屋被司法机关或行政机关依法查封、扣押；（二）该房屋权属存在争议，影响乙方正常使用；（三）该房屋违反法律、行政法规关于使用条件的强制性规定。乙方解除合同的，甲方应退还已收未到期租金及押金，并赔偿乙方相当于1个月租金的损失。",
+                "resultType": "更正",
+                "riskBrief": "未明确承租人在非因其原因导致房屋被查封、权属争议或违反使用条件时的法定解除权",
+                "riskClause": "第九条 合同解除",
+                "riskExplain": "若房屋被司法查封、权属不明或不符合法定使用条件，乙方虽依法可解除合同，但合同未作约定可能导致甲方否认该权利，引发争议，影响乙方及时退出和损失控制。",
+                "riskId": "50863016",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "fe261a3c-6b64-4011-87d9-20290ffdfdbe",
+            "subRuleIndex": "13",
+            "subRuleSequence": "1.15",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同解除条款中，非承租人构成根本性违约承租人可以解除合同条款"
+          },
+          {
+            "examineBrief": "本任务为审查出租人权利瑕疵担保责任条款，合同中未明确规定因第三人主张权利导致承租人不能正常使用租赁物时承租人的权益保障。合同文本存在缺陷，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "medium",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 1,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "第十条 其他约定\n本合同未尽事宜，双方可签订补充协议，补充协议与本合同具有同等法律效力。\n",
+                "relatedRisk": false,
+                "resultContent": "第十条：出租人权利瑕疵担保责任\n\n1. 出租人承诺出租的物品是其合法所有并有权出租。出租人应向承租人保证对租赁物享有完全的、无瑕疵的权利，并保证承租人可以正常地、无干扰地使用和收益。\n\n2. 由于第三人主张权利，以致承租人不能对租赁物正常使用、收益的，出租人应负责处理相关争议。在此种情况下，根据实际情况，承租人有权请求减少租金，或者停止支付租金直至争议解决。\n\n3. 如有第三人对租赁物主张权利，承租人应尽快通知出租人。出租人应在接到通知后及时处理，采取必要措施保护承租人的合法权益不受侵害。\n\n以上合同当事人达成共识，并予以签字确认。",
+                "resultType": "新增",
+                "riskBrief": "未明确规定因第三人主张权利导致承租人不能正常使用租赁物时承租人的权益保障",
+                "riskClause": "权利瑕疵担保责任条款",
+                "riskExplain": "合同中未明确规定因第三人主张权利导致承租人不能正常使用租赁物时承租人的权益保障，存在潜在风险，可能导致承租人在遇到第三方权利主张时无法得到有效的法律保护。",
+                "riskId": "50863013",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "b19c7945-cbc6-4a8a-9914-8b5e6ae11410",
+            "subRuleIndex": "14",
+            "subRuleSequence": "1.14",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同权利瑕疵担保责任条款中，出租人权利瑕疵担保责任"
+          },
+          {
+            "examineBrief": "本任务为审查合同的生效与签订日期，合同中明确了合同生效日期为双方签字之日起，但未明确具体的生效日期，且签订日期处为空白。合同文本存在缺陷，未明确具体的生效日期和签订日期可能会导致法律效力方面的风险，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "medium",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 2,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "本合同一式两份，甲乙双方各执一份，自双方签字（按手印）之日起生效，具有同等法律效力。",
+                "relatedRisk": false,
+                "resultContent": "本合同一式两份，甲乙双方各执一份，自双方签字（按手印）之日起生效，具体生效日期为______年____月____日，具有同等法律效力。",
+                "resultType": "更正",
+                "riskBrief": "未明确具体的生效日期和签订日期",
+                "riskClause": "合同形式与生效条款",
+                "riskExplain": "合同中未明确具体的生效日期和签订日期，可能导致法律效力方面的风险。",
+                "riskId": "50863014",
+                "riskStatus": "success"
+              },
+              {
+                "accept": 0,
+                "originalContent": "出租人（甲方）签字：________________\n日期：______年____月____日\n承租人（乙方）签字：________________\n日期：______年____月____日\n",
+                "relatedRisk": false,
+                "resultContent": "出租人（甲方）签字：________________ 日期：______年____月____日\n承租人（乙方）签字：________________ 日期：______年____月____日",
+                "resultType": "新增",
+                "riskBrief": "签订日期处为空白",
+                "riskClause": "合同形式与生效条款",
+                "riskExplain": "签订日期处为空白，可能导致合同的法律效力存疑。",
+                "riskId": "50863015",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "76fb08fa-11f9-4297-a1cf-62c0b0d80fe9",
+            "subRuleIndex": "15",
+            "subRuleSequence": "1.3",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同形式与生效条款中，合同生效与签订日期审查"
+          },
+          {
+            "examineBrief": "本任务为审查合同中税款条款的明确性、含税与不含税总价计算准确性、增值税率的明确性、税费承担责任明确性以及自然人收款的税务处理，合同中未明确租金是否包含税款，未标明含税与不含税总价，未明确增值税率，未明确税费的承担方，未涉及自然人收款的税务处理。合同文本存在缺陷，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "high",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 1,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "本合同履行过程中发生争议，双方应协商解决；协商不成，可向该房屋所在地（北京市朝阳区）人民法院提起诉讼。\n本合同一式两份，甲乙双方各执一份，自双方签字（按手印）之日起生效，具有同等法律效力。\n",
+                "relatedRisk": false,
+                "resultContent": "6. 税费承担：本合同项下租金为含税价格，包含出租人依法应缴纳的各项税费（包括但不限于增值税、个人所得税、房产税等）。出租人（甲方）自行负责向税务机关申报并缴纳相关税费，承租人（乙方）无代扣代缴义务。如因税务机关要求或政策变化导致税费调整，不影响本合同租金标准，仍由甲方承担全部纳税义务。",
+                "resultType": "新增",
+                "riskBrief": "税费承担责任不明确",
+                "riskClause": "第十条 其他约定",
+                "riskExplain": "合同未明确租金是否含税、税费由谁承担，可能导致乙方被要求补税或承担代扣代缴义务，引发额外财务负担和法律风险。",
+                "riskId": "50863008",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "be10592d-6820-464c-9edb-3fb32b778b31",
+            "subRuleIndex": "16",
+            "subRuleSequence": "1.6",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同税费条款中，合同中税款条款的审核"
+          },
+          {
+            "examineBrief": "本任务为审查是否有送达与通知条款，合同中未见专门的送达与通知条款，仅在个别条款中提到联系方式。合同文本存在缺陷，缺少完整的送达与通知条款，应进行修改以避免潜在的风险。",
+            "examineResult": "需要修改",
+            "isCustomize": 0,
+            "riskLevel": "medium",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 1,
+            "subRisks": [
+              {
+                "accept": 0,
+                "originalContent": "本合同一式两份，甲乙双方各执一份，自双方签字（按手印）之日起生效，具有同等法律效力。\n出租人（甲方）签字：________________\n日期：______年____月____日\n承租人（乙方）签字：________________\n日期：______年____月____日",
+                "relatedRisk": false,
+                "resultType": "新增",
+                "riskBrief": "缺少完整的送达与通知条款",
+                "riskClause": "第十一条 送达与通知",
+                "riskExplain": "合同未约定通知的送达方式、地址、签收效力及电子送达同意，可能导致通知无效、争议难以解决，诉讼中还需另行确认送达地址，增加维权成本。",
+                "riskId": "50863017",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "1eef4f54-673d-46f7-ad3f-4595fc755844",
+            "subRuleIndex": "17",
+            "subRuleSequence": "1.2",
+            "subRuleStatus": "success",
+            "subRuleTitle": "是否有送达与通知条款"
+          },
+          {
+            "examineBrief": "本任务为审查争议解决条款是否完备、合理，合同中明确规定了争议解决方式为诉讼，并指定了管辖法院为北京市朝阳区人民法院，符合民事诉讼法的相关规定。因此，合同文本在此方面不存在缺陷或风险，无需进行修改。",
+            "examineResult": "此处无需修改",
+            "isCustomize": 0,
+            "riskLevel": "normal",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 0,
+            "subRisks": [
+              {
+                "accept": 0,
+                "relatedRisk": false,
+                "resultType": "通过",
+                "riskId": "50862998",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "0f169883-11f6-4c17-88b7-ff4324b9c33d",
+            "subRuleIndex": "18",
+            "subRuleSequence": "1.1",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同争议解决条款中，争议解决的约定是否完备、合理"
+          },
+          {
+            "examineBrief": "本任务为审查保证金缴纳期限是否明确，合同中约定押金应于'本合同签订当日'支付，缴纳时间清晰具体。因此，合同文本在此方面不存在缺陷或风险，无需进行修改。",
+            "examineResult": "此处无需修改",
+            "isCustomize": 0,
+            "riskLevel": "normal",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 0,
+            "subRisks": [
+              {
+                "accept": 0,
+                "relatedRisk": false,
+                "resultType": "通过",
+                "riskId": "50862996",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "0902f472-29ca-4a97-9c38-199a72c39d33",
+            "subRuleIndex": "19",
+            "subRuleSequence": "1.4",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同保证金条款中，保证金的缴纳期限是否明确"
+          },
+          {
+            "examineBrief": "本任务为审查保证金条款中保证金的退还方式是否明确，合同中已经明确规定了押金的退还时间和方式，即在租赁期满且乙方无违约且腾退房屋后，甲方在7个工作日内将押金无息退还。因此，合同文本在此方面不存在缺陷或风险，无需进行修改。",
+            "examineResult": "此处无需修改",
+            "isCustomize": 0,
+            "riskLevel": "normal",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 0,
+            "subRisks": [
+              {
+                "accept": 0,
+                "relatedRisk": false,
+                "resultType": "通过",
+                "riskId": "50863003",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "529009e0-9257-4d6f-b4b3-46e31517f739",
+            "subRuleIndex": "20",
+            "subRuleSequence": "1.5",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同保证金条款中，保证金的退还方式是否明确"
+          },
+          {
+            "examineBrief": "本任务为审查租赁合同中是否约定了其他费用的范围和承担主体，并设置拖欠严重时的解除权与违约责任，合同中虽明确了水电气等费用由乙方承担，但未规定拖欠金额超过押金时出租人可解除合同或收取违约金等风险控制机制。合同文本存在缺陷，可能增加出租人追偿难度，但该缺陷对本方(乙方)是有利的，不需要进行任何修改。",
+            "examineResult": "此处无需修改",
+            "isCustomize": 0,
+            "riskLevel": "normal",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 0,
+            "subRisks": [
+              {
+                "accept": 0,
+                "relatedRisk": false,
+                "resultType": "通过",
+                "riskId": "50863007",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "6ffd3275-8411-4fd1-a9b4-9252aad13e9a",
+            "subRuleIndex": "21",
+            "subRuleSequence": "1.8",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同其他费用条款中，是否约定了其他费用的范围和承担主体"
+          },
+          {
+            "examineBrief": "本任务为审查租赁合同中关于租赁物用途的约定是否明确、合法且符合租赁物性质，合同中已明确约定房屋仅作为住宅使用，禁止擅自改为办公、经营等用途，并禁止从事赌博、传销等违法活动，同时规定了相应的违约责任。条款内容符合《民法典》相关规定，涵盖了主要风险点，未发现对乙方不利的实质性缺陷。",
+            "examineResult": "此处无需修改",
+            "isCustomize": 0,
+            "riskLevel": "normal",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 0,
+            "subRisks": [
+              {
+                "accept": 0,
+                "relatedRisk": false,
+                "resultType": "通过",
+                "riskId": "50862999",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "750eec16-de26-4e17-b662-38af5b7322d0",
+            "subRuleIndex": "22",
+            "subRuleSequence": "1.11",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同租赁物的使用条款中，关于租赁物的用途问题"
+          },
+          {
+            "examineBrief": "本任务为审查租赁合同中关于租赁物转租问题的约定，合同中仅规定第三方长期入住需通知并经同意，但未明确禁止或允许转租，亦未设定转租程序及擅自转租的违约责任。合同文本存在缺陷，未能完整覆盖《民法典》第七百一十六条所涉风险，不过该缺陷对本方(乙方)是有利的，不需要进行任何修改。",
+            "examineResult": "此处无需修改",
+            "isCustomize": 0,
+            "riskLevel": "normal",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 0,
+            "subRisks": [
+              {
+                "accept": 0,
+                "relatedRisk": false,
+                "resultType": "通过",
+                "riskId": "50863005",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "76017119-506c-463e-9e27-e1b422416fea",
+            "subRuleIndex": "23",
+            "subRuleSequence": "1.13",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同租赁物的使用条款中，关于租赁物的转租问题"
+          },
+          {
+            "examineBrief": "本任务为审查合同主体资格，包括自然人民事行为能力、法人有效存续及保证人资格限制。合同中甲乙双方均为自然人，已列明身份信息并设有签字栏，符合自然人订立租赁合同的形式要求。虽未明示‘具备完全民事行为能力’，但依法律规定可作合理推定。合同不涉及法人、分支机构或保证人，相关审查内容不适用。因此，合同文本在此方面不存在缺陷或风险，无需进行修改。",
+            "examineResult": "此处无需修改",
+            "isCustomize": 0,
+            "riskLevel": "normal",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 0,
+            "subRisks": [
+              {
+                "accept": 0,
+                "relatedRisk": false,
+                "resultType": "通过",
+                "riskId": "50863006",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "a2112bee-347b-4501-9b9a-36e1874c0745",
+            "subRuleIndex": "24",
+            "subRuleSequence": "1.17",
+            "subRuleStatus": "success",
+            "subRuleTitle": "审查合同主体资格"
+          },
+          {
+            "examineBrief": "本任务为审查合同主体条款中承租人是否具有相应履行能力，合同中仅登记了乙方基本信息，未设置承租人履约能力的核查机制，也未赋予甲方要求提供财务或信用证明的权利。合同文本存在缺陷，可能影响甲方租金收取的安全性，不过该缺陷对本方(乙方)是有利的，不需要进行任何修改。",
+            "examineResult": "此处无需修改",
+            "isCustomize": 0,
+            "riskLevel": "normal",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 0,
+            "subRisks": [
+              {
+                "accept": 0,
+                "relatedRisk": false,
+                "resultType": "通过",
+                "riskId": "50863000",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "87335fd5-d7eb-4ee3-9054-e845e179acf6",
+            "subRuleIndex": "25",
+            "subRuleSequence": "1.20",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同主体条款中，承租人是否具有相应履行能力"
+          },
+          {
+            "examineBrief": "本任务为审查合同中法律文件引用的准确性和有效性，合同中未引用任何法律文件，既未使用失效法律名称，也未错误简称。因此，合同文本在此方面不存在引用失效或不准确法律文件的缺陷或风险，无需进行修改。",
+            "examineResult": "此处无需修改",
+            "isCustomize": 0,
+            "riskLevel": "normal",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 0,
+            "subRisks": [
+              {
+                "accept": 0,
+                "relatedRisk": false,
+                "resultType": "通过",
+                "riskId": "50862997",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "fb0dd1ee-903c-4ddc-a61e-a1ed72bf7262",
+            "subRuleIndex": "26",
+            "subRuleSequence": "1.21",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同法律条文条款中，确保引用法律文件名称的准确性和有效性"
+          },
+          {
+            "examineBrief": "本任务为审查租赁物条款中标的物名称是否规范，合同中详细描述了租赁房屋的位置、面积、用途和设施等信息，符合不动产租赁物名称规范的要求。因此，合同文本在此方面不存在缺陷或风险，无需进行修改。",
+            "examineResult": "此处无需修改",
+            "isCustomize": 0,
+            "riskLevel": "normal",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 0,
+            "subRisks": [
+              {
+                "accept": 0,
+                "relatedRisk": false,
+                "resultType": "通过",
+                "riskId": "50863002",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "e944acef-5587-4fe0-9548-4ff4ef142d59",
+            "subRuleIndex": "27",
+            "subRuleSequence": "1.23",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同租赁物条款中，标的物名称表述是否规范"
+          },
+          {
+            "examineBrief": "本任务为审查租赁期限条款是否明确，合同中明确规定了租赁期限的具体起止时间和续租条件，符合法律规定。因此，合同文本在此方面不存在缺陷或风险，无需进行修改。",
+            "examineResult": "此处无需修改",
+            "isCustomize": 0,
+            "riskLevel": "normal",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 0,
+            "subRisks": [
+              {
+                "accept": 0,
+                "relatedRisk": false,
+                "resultType": "通过",
+                "riskId": "50863001",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "b9300f2d-e856-493a-81aa-16ff34b53a5b",
+            "subRuleIndex": "28",
+            "subRuleSequence": "1.27",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同租赁期限条款中，租赁期限是否明确"
+          },
+          {
+            "examineBrief": "本任务为审查租赁合同中保证金数额是否足以实现担保目的，合同中约定押金为2个月租金（6000元），未设置押金补足、专户管理及详细扣除程序。合同文本存在缺陷，该金额在长期租赁中可能不足以覆盖违约损失，且条款保护机制不健全。不过该缺陷对本方(乙方)是有利的，不需要进行任何修改。",
+            "examineResult": "此处无需修改",
+            "isCustomize": 0,
+            "riskLevel": "normal",
+            "riskStatus": "success",
+            "subRiskAcceptNum": 0,
+            "subRiskNum": 0,
+            "subRisks": [
+              {
+                "accept": 0,
+                "relatedRisk": false,
+                "resultType": "通过",
+                "riskId": "50863004",
+                "riskStatus": "success"
+              }
+            ],
+            "subRuleId": "a83eea3a-878b-44c4-b9d7-14fdb924b2a8",
+            "subRuleIndex": "29",
+            "subRuleSequence": "1.28",
+            "subRuleStatus": "success",
+            "subRuleTitle": "在合同保证金条款中，保证金的数额是否足以达到担保目的"
+          }
+        ],
+        "ruleSequence": "1"
+      }
+    ],
+    "processingRules": 0,
+    "taskId": "56a833b0-6320-4174-9ee9-82b1acd2c97a",
+    "completeRules": 0,
+    "status": "complete"
+  },
+  "success": true
+}

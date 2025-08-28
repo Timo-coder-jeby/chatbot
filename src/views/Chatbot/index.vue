@@ -41,6 +41,9 @@
         :currentMessages="currentMessages"
         @send-message="handleSendMessage"
       />
+      <CtrRev
+        v-if="curMenuItem.type === 'rev'"
+      />
     </div>
   </div>
 </template>
@@ -58,6 +61,7 @@ import { type IAIService, type ConversationItem, type MessageItem } from '@/serv
 import SideBar from "./components/SideBar.vue";
 import ChatContent from "./components/ChatContent.vue";
 import Case from "./components/Case.vue";
+import CtrRev from "./components/CtrRev.vue";
 
 const aiService = inject<IAIService>('aiService')!
 
@@ -91,8 +95,16 @@ const techMenu = ref([
     apiType: 'ajax',
     type: 'case'
   },
+  {
+    key: 'index-rev',
+    title: '合同审核',
+    icon: h(FileSearchOutlined),
+    apiBase: '/farui/search/case/fulltext',
+    apiType: 'ajax',
+    type: 'rev'
+  },
 ])
-const curMenuIndex = ref(0)
+const curMenuIndex = ref(3)
 const curMenuItem = computed(() => techMenu.value[curMenuIndex.value])
 
 // 对话列表 - 直接从接口获取
@@ -121,7 +133,7 @@ const loadConversationList = async () => {
     const { sessions } = await aiService.get(`/chat/sessions${queryString}`)
 
     // 直接替换整个数组而不是逐个push，减少数组操作次数
-    if (Array.isArray(sessions) && sessions.length > 0) {
+    if (Array.isArray(sessions) && !!sessions?.length) {
       // 一次性映射和排序，减少遍历次数
       const mappedSessions = sessions
         .map((session: any) => ({
@@ -132,7 +144,7 @@ const loadConversationList = async () => {
           timestamp: new Date(session.createTime || session.createTime).getTime(),
           sessionKey: session.sessionId
         }))
-      if (mappedSessions.length > 0) {
+      if (!!mappedSessions?.length) {
         // 直接替换整个数组
         conversationList.splice(0, conversationList.length, ...mappedSessions)
 

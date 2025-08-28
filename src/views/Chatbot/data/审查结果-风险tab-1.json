@@ -1,0 +1,13 @@
+{
+  "url": "https://tyfarui.biz.aliyun.com/contract/examine/result/condition.json",
+  "code": 200,
+  "data": {
+    "riskLevel": {
+      "high": 11,
+      "low": 0,
+      "medium": 6,
+      "pass": 12
+    }
+  },
+  "success": true
+}
