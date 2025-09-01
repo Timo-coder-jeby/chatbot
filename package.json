@@ -13,6 +13,10 @@
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
     "@types/markdown-it": "^14.1.2",
+    "@vue-office/docx": "^1.6.3",
+    "@vue-office/excel": "^1.7.14",
+    "@vue-office/pdf": "^2.0.10",
+    "@vue-office/pptx": "^1.0.1",
     "ant-design-vue": "^4.2.6",
     "ant-design-x-vue": "^1.2.8",
     "axios": "^1.10.0",
@@ -21,6 +25,7 @@
     "markdown-it-highlightjs": "^4.2.0",
     "pinia": "^3.0.3",
     "vue": "^3.5.17",
+    "vue-demi": "0.14.6",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {

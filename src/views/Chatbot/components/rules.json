@@ -1,0 +1,197 @@
+{
+  "ruleTaskId": "5343e2e6-d394-4331-95f9-38a4bb5ebc89",
+  "rules": [
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "1.1",
+      "ruleTag": "简要审查合同主体及合法性",
+      "ruleTitle": "审查合同主体资格"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "1.2",
+      "ruleTag": "简要审查合同主体及合法性",
+      "ruleTitle": "在合同主体条款中，合同主体信息是否准确、是否适格"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "1.3",
+      "ruleTag": "简要审查合同主体及合法性",
+      "ruleTitle": "在合同主体条款中，出租人是否为标的物权利人"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "1.4",
+      "ruleTag": "简要审查合同主体及合法性",
+      "ruleTitle": "在合同主体条款中，承租人是否具有相应履行能力"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "1.5",
+      "ruleTag": "简要审查合同主体及合法性",
+      "ruleTitle": "在合同法律条文条款中，确保引用法律文件名称的准确性和有效性"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.1",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁物条款中，标的物名称表述是否特定"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.2",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁物条款中，标的物名称表述是否规范"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.3",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁物条款中，标的物特征是否表述全面"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.4",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁物条款中，租赁物是否合法"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.5",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁期限条款中，是否约定免租期"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.6",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁期限条款中，租赁期限是否明确"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.7",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "租金的标准、租金是否每年变更、租金的支付期限、租金的支付方式、未按照约定支付租金的后果。主要审查租金条款的一般内容是否全面约定，有没有遗漏，如租金的标准是否约定明确，租金是否每年递增，如果递增，每年递增的幅度是多少，是固定的递增，还是按照比例递增如果租金约定不明确，租金支付期限约定不明确，那么，法律有相应规定进行调整但法律规定的调整，不一定符合当事人的需要，因此审查时需要与当事人沟通"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "2.8",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同保证金条款中，保证金的数额是否足以达到担保目的"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "2.9",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同保证金条款中，保证金的缴纳期限是否明确"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "2.10",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同保证金条款中，保证金的退还方式是否明确"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.11",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同税费条款中，合同中税款条款的审核"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.12",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "发票条款的规范性与完整性审核"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "2.13",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同其他费用条款中，是否约定了其他费用的范围和承担主体"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.14",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁物交付条款中，租赁物的交付时间、交付条件、交付方式是否完备、明确"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.15",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁物返还条款中，出租方交付租赁物和承租方交还租赁物，租赁物返还时间及流程，是否需要验收"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.16",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁物的使用条款中，关于租赁物的用途问题"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.17",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁物的使用条款中，关于租赁物的装修装饰问题"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.18",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁物的使用条款中，关于租赁物的转租问题"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.19",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁物的维修条款中，租赁物的维修范围、维修主体、维修期限、维修方式等是否都有约定，是否都已约定明确"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.20",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同租赁物增设他物与扩建条款中，出租人是否同意增设他物与扩建、如果可以增设他物与扩建，增设他物与扩建的范围是什么，或者禁止增设他物与扩建的范围是什么、增设他物与扩建后的财产归属"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "2.21",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同权利瑕疵担保责任条款中，出租人权利瑕疵担保责任"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.22",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同解除条款中，非承租人构成根本性违约承租人可以解除合同条款"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "2.23",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同违约责任条款中，根据双方的合同义务确定违约责任"
+    },
+    {
+      "riskLevel": "high",
+      "ruleSequence": "2.24",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同终止条款中，包括合同终止的情形以及合同终止后相关后续事宜的处理等"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "2.25",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同争议解决条款中，争议解决的约定是否完备、合理"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "2.26",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "是否有送达与通知条款"
+    },
+    {
+      "riskLevel": "medium",
+      "ruleSequence": "2.27",
+      "ruleTag": "简要审查合同的主要条款",
+      "ruleTitle": "在合同形式与生效条款中，合同生效与签订日期审查"
+    }
+  ]
+}
