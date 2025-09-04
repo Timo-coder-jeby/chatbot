@@ -3,9 +3,9 @@ import type {IAIService} from "@/services/aiService.ts";
 
 const aiService = inject<IAIService>('aiService')!
 
-import {inject, onBeforeUnmount, reactive, ref} from 'vue'
+import {inject, onBeforeUnmount, reactive, ref,computed} from 'vue'
 import Creator from './CtrComp/Creator.vue'
-import Rules from './rules.vue'
+import Rules from './CtrComp/rules.vue'
 import {message} from "ant-design-vue";
 
 import rules from './rules.json'
@@ -44,6 +44,12 @@ const startProgress = (text = '分析中') => {
     uploadStatus.dots = '.'.repeat(dotCount)
   }, 300)
 }
+
+const rulesProp = computed(() => ({
+  ...uploadStatus?.originFile ?? {},
+  fileId: uploadStatus?.fileId,
+  ruleTaskId: ruleList?.value?.ruleTaskId
+}))
 
 const getRules = () => {
   if (!uploadStatus?.fileId) {
@@ -117,7 +123,7 @@ onBeforeUnmount(() => {
     </template>
     <Rules
       v-else
-      :file="uploadStatus?.originFile"
+      :file="rulesProp"
       :ruleList="ruleList?.rules"
     />
   </div>
