@@ -259,10 +259,10 @@ class AIService implements IAIService {
     })
   }
   post(url: string,data?:any,cof?:any):Promise<any>{
-    return new Promise((resolve) => {
+    return new Promise((resolve,reject) => {
       this.service.post(url,data,cof)
         .then((resp:any) => resolve(resp.data || resp?.data))
-        .catch((error:any) => resolve(error))
+        .catch((error:any) => reject({message:error?.message,code:error?.code}))
     })
   }
   del(url: string,params?:any,cof?:any):Promise<any>{

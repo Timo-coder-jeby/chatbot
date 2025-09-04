@@ -53,7 +53,7 @@ const getActiveKey = (riskIndex: number) => {
 
 <template>
   <div class="col-span-1 flex-1 px-4 pb-4 flex flex-col overflow-hidden risk-box">
-    <div class="grid grid-cols-4 gap-x-2 bg-white pb-4">
+    <div class="grid grid-cols-4 gap-x-4 bg-white pb-4">
       <div
         class="col-span-1 h-[30px] rounded-md bg-orange-50 inline-flex items-center justify-center text-xs hover:font-semibold hover:bg-orange-100 hover:shadow-md transition-all duration-200 cursor-pointer"
         :class="defaultRiskLevelKey === key ? 'bg-orange-100 font-semibold shadow-md scale-105' : ''"

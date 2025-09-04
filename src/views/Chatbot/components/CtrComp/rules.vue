@@ -9,40 +9,62 @@ import { message } from "ant-design-vue";
 const aiService = inject<IAIService>('aiService')!
 
 const props = withDefaults(
- defineProps<{
-   ruleList: any[]
+  defineProps<{
    file: any
- }>(),
- {
-    ruleList: () => []
- }
+  }>(),{
+    file: null
+  }
 )
 
 const params = reactive({
   position: '1'
 })
 
+const ruleList = reactive<any>({
+  ruleTaskId: '',
+  rules: []
+})
 const isSelectAll = ref<boolean>(false)
 const activeStep = ref<number>(0)
 const loading = ref<boolean>(false)
 const result = ref<any>(null)
 
+const getRules = () => {
+  loading.value = true
+  aiService.post('/chat/farui/contract/rule/generate',{
+    assistant: {
+      metaData: {
+        fileId: props?.file?.fileId,
+        position: params.position
+      }
+    }
+  })
+    .then(res => {
+      ruleList.ruleTaskId = res?.output?.ruleTaskId
+      ruleList.rules = res?.output?.rules?.map((vo:any) => ({...vo,checked: 1})) ?? []
+      activeStep.value = 1
+    })
+    .catch(_ => message.warning('生成审查清单失败,请稍后再试!'))
+    .finally(() => loading.value = false)
+}
+
+
 const checkedList = computed({
   get: () => {
-    const checkedList = props?.ruleList.filter((item) => item.checked == 1)
-    isSelectAll.value = checkedList?.length == props.ruleList?.length
+    const checkedList = ruleList?.rules.filter((item) => item.checked == 1)
+    isSelectAll.value = checkedList?.length == ruleList?.rules.length
     return checkedList
   },
   set: (value) => {
-    isSelectAll.value = value.length === props?.ruleList?.length
-    props.ruleList.forEach((item) => {
+    isSelectAll.value = value.length === ruleList?.rules?.length
+    ruleList.rules.forEach((item) => {
       item.checked = value.includes(item) ? 1 : 0
     })
   },
 })
 
 const selectAllChange = () => {
-  checkedList.value = !!isSelectAll.value ? [...props?.ruleList] : []
+  checkedList.value = !!isSelectAll.value ? [...ruleList?.rules] : []
 }
 const generate = () => {
   loading.value = true
@@ -51,7 +73,7 @@ const generate = () => {
       metaData: {
         fileId: props?.file?.fileId,
         position: params.position,
-        ruleTaskId: props?.file?.ruleTaskId,
+        ruleTaskId: ruleList?.ruleTaskId,
         rules: checkedList?.value ?? []
       }
     }
@@ -69,12 +91,43 @@ const generate = () => {
 }
 
 const stepChange = (step: number) => {
-  if (step == 1) {
-    result.value = null
+  switch (step) {
+    case 0:
+      activeStep.value = step
+      result.value = null
+      ruleList.ruleTaskId = ''
+      ruleList.rules = []
+      checkedList.value = []
+      break
+    case 1:
+      activeStep.value = step
+      result.value = null
+      getRules()
+      break
+    case 2:
+      if (!checkedList.value?.length) {
+        message.warning('还未生成审查清单,请先生成审查清单!')
+        return
+      }
+      generate()
+      break
   }
-  if (step == 2) {
-    generate()
-  }
+  // if (step == 0) {
+  //   activeStep.value = step
+  //   result.value = null
+  //   ruleList.ruleTaskId = ''
+  //   ruleList.rules = []
+  //   checkedList.value = []
+  // }
+  // if (step == 1) {
+  //   activeStep.value = step
+  //   result.value = null
+  //   getRules()
+  // }
+  // if (step == 2) {
+  //   if (!checkedList.value?.length) return
+  //   generate()
+  // }
 }
 
 </script>
@@ -95,10 +148,10 @@ const stepChange = (step: number) => {
       tip="正在生成审查结果,请稍候..."
       wrapper-class-name="h-full overflow-hidden"
     >
-      <div class="p-4">
+      <div class="p-4 bg-gradient-to-br from-orange-50 via-red-50 to-pink-100">
         <a-steps
           size="small"
-          v-model:current="activeStep"
+          :current="activeStep"
           @change="stepChange"
           :items="[
             {title: '审查方式'},
@@ -108,7 +161,7 @@ const stepChange = (step: number) => {
         />
       </div>
       <div class="col-span-1 h-full px-4 pb-4 flex flex-col overflow-hidden" v-if="activeStep == 0">
-        <div class="pt-4">
+        <div class="pt-8">
           <div class="font-semibold mb-2">审查立场</div>
           <a-radio-group v-model:value="params.position">
             <a-radio value="1">甲方立场</a-radio>
@@ -116,13 +169,19 @@ const stepChange = (step: number) => {
             <a-radio value="0">中立立场</a-radio>
           </a-radio-group>
         </div>
+        <div class="m-[10vh_auto]">
+          <a-button type="primary" class="ml-auto" @click="getRules">下一步</a-button>
+        </div>
       </div>
-      <div class="col-span-1 h-full px-4 pb-4 flex flex-col overflow-hidden" v-if="!result && activeStep == 1">
-        <div class="bg-gradient-to-br from-orange-50 via-red-50 to-pink-100 pl-4 py-2 rounded-lg flex items-center justify-between">
+      <div
+        class="col-span-1 h-full px-4 pb-4 flex flex-col overflow-hidden"
+        v-if="!result && activeStep == 1"
+      >
+        <div class="pl-4 py-2 rounded-lg flex items-center justify-between border-b-c">
           <a-checkbox
             v-model:checked="isSelectAll"
             @change="selectAllChange"
-          >已选择 {{ checkedList.length }}/ {{ props?.ruleList?.length }} 项</a-checkbox>
+          >已选择 {{ checkedList.length }}/ {{ ruleList?.rules?.length }} 项</a-checkbox>
           <a-button type="link" class="ml-auto" @click="generate">生成审查结果</a-button>
         </div>
         <div class="flex-1 overflow-y-auto pl-4">
@@ -132,7 +191,7 @@ const stepChange = (step: number) => {
             v-model:value="checkedList"
           >
             <a-checkbox
-              v-for="(rule, index) in ruleList"
+              v-for="(rule, index) in ruleList.rules"
               :key="index"
               :value="rule"
               class="flex items-center"
@@ -145,8 +204,8 @@ const stepChange = (step: number) => {
         </div>
       </div>
       <ResultComp
-        v-else
-        :data="result && activeStep == 2"
+        v-if="activeStep == 2"
+        :data="result"
       />
     </a-spin>
   </div>

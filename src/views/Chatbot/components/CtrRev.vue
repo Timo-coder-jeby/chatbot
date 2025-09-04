@@ -20,7 +20,6 @@ const uploadStatus = reactive({
   originFile: null as any
 })
 
-const ruleList:any = ref()
 
 const startProgress = (text = '分析中') => {
   uploadStatus.procText = text
@@ -31,13 +30,12 @@ const startProgress = (text = '分析中') => {
   }
   uploadStatus.interval = setInterval(() => {
     // 进度递增到80时暂停并请求接口
-    if (uploadStatus.progress < 90) {
+    if (uploadStatus.progress < 100) {
       uploadStatus.progress += Math.floor(Math.random() * 10) + 1
-      if (uploadStatus.progress >= 90) {
-        uploadStatus.progress = 90
+      if (uploadStatus.progress >= 100) {
+        uploadStatus.progress = 100
         clearInterval(uploadStatus.interval)
         uploadStatus.interval = null
-        getRules()
       }
     }
     let dotCount = (uploadStatus.dots.length + 1) % 4
@@ -48,44 +46,8 @@ const startProgress = (text = '分析中') => {
 const rulesProp = computed(() => ({
   ...uploadStatus?.originFile ?? {},
   fileId: uploadStatus?.fileId,
-  ruleTaskId: ruleList?.value?.ruleTaskId
+  // ruleTaskId: ruleList?.value?.ruleTaskId
 }))
-
-const getRules = () => {
-  if (!uploadStatus?.fileId) {
-    message.warning('文件故障,请重新上传!')
-    return
-  }
-  aiService.post('/chat/farui/contract/rule/generate',{
-    assistant: {
-      metaData: {
-        fileId: uploadStatus?.fileId,
-        position: '1'
-      }
-    }
-  })
-    .then(res => {
-      ruleList.value = {
-        ruleTaskId: res?.output?.ruleTaskId,
-        rules: res?.output?.rules?.map((vo:any) => ({...vo,checked: 1})) ?? []
-      }
-      uploadStatus.progress = 100
-      // dots继续动态
-      if (!uploadStatus.interval) {
-        uploadStatus.interval = setInterval(() => {
-          let dotCount = (uploadStatus.dots.length + 1) % 4
-          uploadStatus.dots = '.'.repeat(dotCount)
-        }, 300)
-      }
-      // 进度到100后清理定时器
-      setTimeout(() => {
-        if (uploadStatus.interval) {
-          clearInterval(uploadStatus.interval)
-          uploadStatus.interval = null
-        }
-      }, 500)
-    })
-}
 
 const uploadChange = (file:any) => {
   uploadStatus.uploaded = true
@@ -105,7 +67,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="grid row-span-2 relative">
-    <template v-if="!ruleList">
+    <template v-if="!uploadStatus?.fileId">
 <!--    <template v-if="!uploadStatus.originFile">-->
       <div class="absolute top-0 z-20 w-full h-full p-4" v-if="uploadStatus.uploaded">
         <p class="text-xs text-gray-400">分析中{{ uploadStatus.dots }}</p>
@@ -124,7 +86,6 @@ onBeforeUnmount(() => {
     <Rules
       v-else
       :file="rulesProp"
-      :ruleList="ruleList?.rules"
     />
   </div>
 </template>
