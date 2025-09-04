@@ -145,7 +145,7 @@ const stepChange = (step: number) => {
     </div>
     <a-spin
       :spinning="loading"
-      tip="正在生成审查结果,请稍候..."
+      tip="审查分析中,请稍候..."
       wrapper-class-name="h-full overflow-hidden"
     >
       <div class="p-4 bg-gradient-to-br from-orange-50 via-red-50 to-pink-100">
