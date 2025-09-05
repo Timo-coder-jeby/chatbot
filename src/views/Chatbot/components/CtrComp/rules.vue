@@ -162,7 +162,7 @@ const stepChange = (step: number) => {
         />
       </div>
       <div class="col-span-1 h-full px-4 pb-4 flex flex-col overflow-hidden" v-if="activeStep == 0">
-        <div class="pt-8">
+        <div class="pt-8 pl-8">
           <div class="font-semibold mb-2">审查立场</div>
           <a-radio-group v-model:value="params.position">
             <a-radio value="1">甲方立场</a-radio>
