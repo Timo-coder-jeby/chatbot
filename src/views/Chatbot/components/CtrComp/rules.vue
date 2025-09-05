@@ -17,7 +17,8 @@ const props = withDefaults(
 )
 
 const params = reactive({
-  position: '1'
+  position: '1',
+  bargaining: '1', // 1-强势 2-弱势 3-均势
 })
 
 const ruleList = reactive<any>({
@@ -170,7 +171,7 @@ const stepChange = (step: number) => {
           </a-radio-group>
         </div>
         <div class="m-[10vh_auto]">
-          <a-button type="primary" class="ml-auto" @click="getRules">下一步</a-button>
+          <a-button type="primary" class="ml-auto" @click="getRules">生成审查清单</a-button>
         </div>
       </div>
       <div
