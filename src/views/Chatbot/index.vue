@@ -104,7 +104,7 @@ const techMenu = ref([
     type: 'rev'
   },
 ])
-const curMenuIndex = ref(3)
+const curMenuIndex = ref(0)
 const curMenuItem = computed(() => techMenu.value[curMenuIndex.value])
 
 // 对话列表 - 直接从接口获取
