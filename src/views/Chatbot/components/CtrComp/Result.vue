@@ -84,7 +84,7 @@ const getActiveKey = (riskIndex: number) => {
               <a-tabs
                 tab-position="top"
                 :activeKey="getActiveKey(idx)"
-                @tabClick="(key) => riskItemTabClick(key, idx)"
+                @tabClick="(key:any) => riskItemTabClick(key, idx)"
               >
                 <a-tab-pane
                   v-for="(subRisk,subIdx) in risk?.subRisks ?? []"

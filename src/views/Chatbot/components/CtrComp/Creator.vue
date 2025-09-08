@@ -8,7 +8,7 @@ const emit = defineEmits<{
 }>()
 
 const fileList = ref([])
-const BASEURL = import.meta.env.VITE_APP_BASE_API
+const BASEURL = import.meta.env.VITE_APP_UPLOAD_API
 
 const uploadChange = ({file}:any) => {
   if (file.status === 'done'){

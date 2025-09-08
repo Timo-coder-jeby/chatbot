@@ -75,7 +75,7 @@ const techMenu = ref([
     key: 'advisory',
     title: '法律咨询',
     icon: h(MessageOutlined),
-    apiBase: '/farui/legalAdvice/consult',
+    apiBase: '/chat/farui/legalAdvice/consult',
     apiType: 'stream',
     type: 'consult'
   },
@@ -83,7 +83,7 @@ const techMenu = ref([
     key: 'index-law',
     title: '法律检索',
     icon: h(SearchOutlined),
-    apiBase: '/farui/search/law/query',
+    apiBase: '/chat/farui/search/law/query',
     apiType: 'ajax',
     type: 'law'
   },
@@ -91,7 +91,7 @@ const techMenu = ref([
     key: 'index-case',
     title: '案例检索',
     icon: h(FileSearchOutlined),
-    apiBase: '/farui/search/case/fulltext',
+    apiBase: '/chat/farui/search/case/fulltext',
     apiType: 'ajax',
     type: 'case'
   },
@@ -99,7 +99,7 @@ const techMenu = ref([
     key: 'index-rev',
     title: '合同审核',
     icon: h(FileSearchOutlined),
-    apiBase: '/farui/search/case/fulltext',
+    apiBase: '/chat/farui/search/case/fulltext',
     apiType: 'ajax',
     type: 'rev'
   },
@@ -121,6 +121,7 @@ onMounted(() => {
  * 加载对话列表
  */
 const loadConversationList = async () => {
+  console.log('环境',import.meta.env,import.meta.env.VITE_AI_BASE_URL);
   try {
     // 根据当前菜单类型构建请求参数
     const requestParams: any = {}

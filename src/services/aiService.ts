@@ -61,7 +61,6 @@ class AIService implements IAIService {
     this.config = config
     this.service = axios
   }
-
   // 创建新会话
   async createMessage(type?: string): Promise<AIResponse> {
     try {
@@ -253,28 +252,28 @@ class AIService implements IAIService {
 
   get(url: string,params?:any,cof?:any):Promise<any>{
     return new Promise((resolve) => {
-      this.service.get(url,{params,...cof})
+      this.service.get(`${this.config.baseURL}${url}`,{params,...cof})
         .then((resp:any) => resolve(resp?.data?.data || resp?.data))
         .catch((error) => resolve(error))
     })
   }
   post(url: string,data?:any,cof?:any):Promise<any>{
     return new Promise((resolve,reject) => {
-      this.service.post(url,data,cof)
+      this.service.post(`${this.config.baseURL}${url}`,data,cof)
         .then((resp:any) => resolve(resp.data || resp?.data))
         .catch((error:any) => reject({message:error?.message,code:error?.code}))
     })
   }
   del(url: string,params?:any,cof?:any):Promise<any>{
     return new Promise((resolve) => {
-      this.service.delete(url,{params,...cof})
+      this.service.delete(`${this.config.baseURL}${url}`,{params,...cof})
         .then((resp:any) => resolve(resp?.data?.data || resp?.data))
         .catch((error:any) => resolve(error))
     })
   }
   put(url: string,data?:any,cof?:any):Promise<any>{
     return new Promise((resolve) => {
-      this.service.put(url,data,cof)
+      this.service.put(`${this.config.baseURL}${url}`,data,cof)
         .then((resp:any) => resolve(resp?.data?.data || resp?.data))
         .catch((error:any) => resolve(error))
     })
@@ -286,7 +285,7 @@ class AIService implements IAIService {
 export const createAIService = (config?: Partial<AIConfig>) => {
   const defaultConfig: AIConfig = {
     apiKey: import.meta.env.VITE_AI_API_KEY || '',
-    baseURL: import.meta.env.VITE_AI_BASE_URL || '/chat',
+    baseURL: import.meta.env.VITE_APP_BASE_API || '',
     model: import.meta.env.VITE_AI_MODEL,
     ...config
   }

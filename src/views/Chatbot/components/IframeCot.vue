@@ -77,7 +77,6 @@ const openInNewWindow = () => {
           :title="title"
           class="iframe-frame"
           sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-          @load="handleIframeLoad"
         ></iframe>
       </div>
     </div>

@@ -52,13 +52,13 @@ const getRules = () => {
 
 const checkedList = computed({
   get: () => {
-    const checkedList = ruleList?.rules.filter((item) => item.checked == 1)
+    const checkedList = ruleList?.rules.filter((item:any) => item.checked == 1)
     isSelectAll.value = checkedList?.length == ruleList?.rules.length
     return checkedList
   },
   set: (value) => {
     isSelectAll.value = value.length === ruleList?.rules?.length
-    ruleList.rules.forEach((item) => {
+    ruleList.rules.forEach((item:any) => {
       item.checked = value.includes(item) ? 1 : 0
     })
   },
