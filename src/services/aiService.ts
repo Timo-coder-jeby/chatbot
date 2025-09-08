@@ -66,7 +66,7 @@ class AIService implements IAIService {
     try {
       // 这里可以替换为不同的 AI 服务 (OpenAI, Claude, 本地模型等)
       const response = await axios.get(
-        `${this.config.baseURL}/new-session`,
+        `${this.config.baseURL}/chat/new-session`,
         {
           headers: {
             'Authorization': `Bearer ${this.config.apiKey}`,
