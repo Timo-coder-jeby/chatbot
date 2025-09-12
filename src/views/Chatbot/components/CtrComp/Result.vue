@@ -62,7 +62,7 @@ const getActiveKey = (riskIndex: number) => {
         :key="key"
       >{{ val }}({{ groupByRiskLevel[key]?.length ?? 0 }})</div>
     </div>
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto pt-2">
       <template v-if="!!curRiskLevel.length">
         <a-collapse :bordered="false" style="background-color: #fff">
           <a-collapse-panel
