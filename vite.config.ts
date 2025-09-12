@@ -24,7 +24,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/upload/, ''),
         // target: 'http://192.168.100.39:16070'
-        target: 'http://172.18.17.108:16070'
+        target: 'http://172.31.9.192:16070'
       }
     }
   },
