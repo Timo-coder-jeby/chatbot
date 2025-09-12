@@ -147,7 +147,7 @@ const handleMenuClick = (e: any, conversationKey: string) => {
           v-for="conversation in conversationList"
           :key="conversation.key"
           :class="[
-            'relative flex items-center overflow-hidden justify-between p-4 rounded-2xl cursor-pointer transition-all duration-300 shadow-md',
+            'group relative flex items-center overflow-hidden justify-between p-4 rounded-2xl cursor-pointer transition-all duration-300 shadow-md',
             'hover:bg-red-50 hover:border-red-200 hover:shadow-lg hover: text-orange-600 hover:scale-105',
             conversation.key === activeConversationKey
               ? 'bg-gradient-to-r from-red-50 to-rose-50 border-0 shadow-lg scale-105'
@@ -189,10 +189,10 @@ const handleMenuClick = (e: any, conversationKey: string) => {
               <a-button
                 type="text"
                 size="small"
-                class="w-7 h-7 flex items-center justify-center border-0 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700 transition-all duration-300 hover:scale-110"
+                class="w-7 h-7 flex items-center justify-center border-0 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-all duration-300 hover:scale-105"
               >
                 <template #icon>
-                  <SettingOutlined class="text-xs" />
+                  <SettingOutlined />
                 </template>
               </a-button>
               <template #overlay>
