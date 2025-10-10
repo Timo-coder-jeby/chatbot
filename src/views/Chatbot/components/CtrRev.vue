@@ -25,6 +25,7 @@ type Props = {
 const props = defineProps<Props>()
 const emit = defineEmits<{
   'conversation-change': [key: string]
+  'changeLoading': [key: boolean]
 }>()
 const APIBASE = import.meta.env.VITE_APP_FILE_URL
 
@@ -57,6 +58,7 @@ const resetDefaultValue = () => {
 const loadHistoryResults = async () => {
   if (!currentConversation.value?.sessionKey) return
   try {
+    emit('changeLoading', true)
     // 获取历史会话消息
     const response = await aiService.post(
       `/chat/session/messages`,
@@ -77,9 +79,8 @@ const loadHistoryResults = async () => {
 
   } catch (error) {
     console.error('加载历史搜索结果失败:', error)
-    // searchResults.value = []
   } finally {
-    // isSearching.value = false
+    emit('changeLoading', false)
   }
 }
 

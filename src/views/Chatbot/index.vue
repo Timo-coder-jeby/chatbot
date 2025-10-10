@@ -20,7 +20,10 @@
     />
 
     <!-- 右侧聊天区域 -->
-    <div class="col-start-2 row-start-1 grid grid-rows-[auto_1fr] bg-white/95 backdrop-blur-xl relative z-10 rounded-3xl shadow-2xl border border-red-100/30 overflow-hidden">
+    <div
+      v-loading="loading"
+      class="col-start-2 row-start-1 grid grid-rows-[auto_1fr] bg-white/95 backdrop-blur-xl relative z-10 rounded-3xl shadow-2xl border border-red-100/30 overflow-hidden"
+    >
       <!-- 法律咨询时显示聊天内容 -->
       <ChatContent
         v-if="curMenuItem.type === 'consult'"
@@ -48,6 +51,7 @@
         :activeConversationKey="activeConversationKey"
         :currentMessages="currentMessages"
         @conversation-change="handleConversationChange"
+        @changeLoading="changeLoading"
       />
     </div>
   </div>
@@ -72,6 +76,7 @@ const aiService = inject<IAIService>('aiService')!
 
 // 响应式数据
 const activeConversationKey = ref('conv-1')
+const loading = ref<boolean>(false)
 const isTyping = ref(false)
 const senderValue = ref('')
 const chatContentRef = ref<InstanceType<typeof ChatContent>>()
@@ -121,6 +126,8 @@ const currentMessages = ref<MessageItem[]>([])
 onMounted(() => {
   loadConversationList()
 })
+
+const changeLoading = (val: boolean) => loading.value = val
 
 /**
  * 加载对话列表
@@ -228,6 +235,7 @@ const loadCurrentMessages = async (key: string) => {
   try {
     // fixme 如果是ajax请求组件内加载内容
     if (curMenuItem.value?.apiType == 'ajax') return
+    changeLoading(true)
     const response = await aiService.post(`/chat/session/messages`,{sessionId: key})
 
     if (!response || !Array.isArray(response)) {
@@ -270,7 +278,7 @@ const loadCurrentMessages = async (key: string) => {
 
     // 直接赋值，避免响应式数组操作开销
     currentMessages.value = messages
-
+    changeLoading(false)
     // 使用 nextTick 优化 DOM 更新时机
     nextTick(() => scrollToBottom())
 
