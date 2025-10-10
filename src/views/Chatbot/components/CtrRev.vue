@@ -27,7 +27,7 @@ const emit = defineEmits<{
   'conversation-change': [key: string]
   'changeLoading': [key: boolean]
 }>()
-const APIBASE = import.meta.env.VITE_APP_FILE_URL
+const FILE_BASE = import.meta.env.VITE_APP_FILE_URL
 
 const createInitialUploadStatus = () => ({
   fileId: '',
@@ -70,7 +70,7 @@ const loadHistoryResults = async () => {
     if(response?.attachments) {
       uploadStatus.fileId = response?.attachments[0]?.fileId
       uploadStatus.originFile = {
-        originFileObj: `${APIBASE}${response?.attachments[0]?.previewUrl}`,
+        originFileObj: `${FILE_BASE || location.href}${response?.attachments[0]?.previewUrl}`,
         status: 'done',
         percent: 100,
         name: response?.attachments[0]?.fileName,
