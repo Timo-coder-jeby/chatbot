@@ -10,6 +10,9 @@ interface SpinInstance {
   instance: HTMLElement | null;
 }
 
+// 使用 WeakMap 存储 spin 实例，避免内存泄漏
+const spinMap = new WeakMap<HTMLElement, SpinInstance>();
+
 const spinDirective = {
   mounted(el: HTMLElement, binding: { value: boolean }) {
     const spinContainer = document.createElement('div');
@@ -32,20 +35,22 @@ const spinDirective = {
     render(vnode, spinContainer);
 
     const spinInstance: SpinInstance = {
-      instance: null,
+      instance: spinContainer,
     };
 
-    spinInstance.instance = spinContainer;
+    el.style.position = el.style.position || 'relative';
 
-    el.style.position = 'relative';
-    el.__spinInstance = spinInstance; // Attach spin instance to the element
+    // 使用 WeakMap 存储 spin 实例
+    spinMap.set(el, spinInstance);
 
     if (binding.value) {
       el.appendChild(spinContainer);
     }
   },
   updated(el: HTMLElement, binding: { value: boolean }) {
-    const spinInstance = el.__spinInstance as SpinInstance;
+    const spinInstance = spinMap.get(el);
+
+    if (!spinInstance) return;
 
     if (binding.value && !spinInstance.instance?.parentNode) {
       el.appendChild(spinInstance.instance!);
@@ -54,11 +59,14 @@ const spinDirective = {
     }
   },
   unmounted(el: HTMLElement) {
-    const spinInstance = el.__spinInstance as SpinInstance;
-    if (spinInstance.instance?.parentNode) {
+    const spinInstance = spinMap.get(el);
+
+    if (spinInstance?.instance?.parentNode) {
       el.removeChild(spinInstance.instance);
     }
-    delete el.__spinInstance;
+
+    // 清理 WeakMap 中的引用
+    spinMap.delete(el);
   },
 };
 
