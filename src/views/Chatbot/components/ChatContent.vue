@@ -461,7 +461,16 @@ defineExpose({
             }
           }
 
-
+          code {
+            //padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: break-word;
+          }
           //pre {
           //  margin: 18px 0;
           //  border-radius: 8px;
