@@ -42,7 +42,12 @@
         @send-message="handleSendMessage"
       />
       <CtrRev
-        v-if="curMenuItem.type === 'rev'"
+        v-if="curMenuItem.type === 'contract'"
+        :curMenuItem="curMenuItem"
+        :conversationList="conversationList"
+        :activeConversationKey="activeConversationKey"
+        :currentMessages="currentMessages"
+        @conversation-change="handleConversationChange"
       />
     </div>
   </div>
@@ -96,12 +101,12 @@ const techMenu = ref([
     type: 'case'
   },
   {
-    key: 'index-rev',
+    key: 'index-contract',
     title: '合同审核',
     icon: h(FileSearchOutlined),
-    apiBase: '/chat/farui/search/case/fulltext',
+    apiBase: '',
     apiType: 'ajax',
-    type: 'rev'
+    type: 'contract'
   },
 ])
 const curMenuIndex = ref(0)
